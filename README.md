@@ -1,4 +1,4 @@
-aws-system-administration-resources
-===================================
+aws-system-administration
+=========================
 
-Scripts and resources for the AWS System Administration book
+Sample code and examples for AWS System Administration

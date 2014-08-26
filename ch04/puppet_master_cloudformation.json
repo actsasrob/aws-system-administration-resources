@@ -1,0 +1,222 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Example Puppet master stack",
+    "Parameters" : {
+        "KeyName": {
+            "Description" : "EC2 KeyPair name",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "255",
+            "AllowedPattern" : "[\\x20-\\x7E]*",
+            "ConstraintDescription" : "can contain only ASCII characters."
+        },
+        "AMI" : {
+            "Description" : "AMI ID",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "CFNKeys": {<co id="cfn_keys_co" />
+            "Type": "AWS::IAM::AccessKey",
+            "Properties": {
+                "UserName": {
+                    "Ref": "CFNInitUser"
+                }
+            }
+        },
+        "CFNInitUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "AccessForCFNInit",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "cloudformation:DescribeStackResource",
+                                    "Resource": "*",
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "PuppetClientSecurityGroup": {<co id="puppet_client_group_co" />
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "SecurityGroupIngress": [
+                    {
+                        "ToPort": "22",
+                        "IpProtocol": "tcp",
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "22"
+                    }
+                ],
+                "GroupDescription": "Group for clients to communicate with Puppet master"
+            }
+        },
+        "PuppetMasterSecurityGroup": {<co id="puppet_master_group_co" />
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "SecurityGroupIngress": [
+                    {
+                        "ToPort": "8140",
+                        "IpProtocol": "tcp",
+                        "SourceSecurityGroupName": { "Ref": "PuppetClientSecurityGroup"},
+                        "FromPort": "8140"
+                    },
+                    {
+                        "ToPort": "22",
+                        "IpProtocol": "tcp",
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "22"
+                    }
+                ],
+                "GroupDescription": "Group for puppet client -&gt; master communication"
+            }
+        },
+        "PuppetMasterInstance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "UserData": {<co id="user_data_co" />
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "/opt/aws/bin/cfn-init --region ", { "Ref": "AWS::Region" },  " -s ",
+                                { "Ref": "AWS::StackName" }, " -r PuppetMasterInstance ",
+                                " --access-key ", { "Ref": "CFNKeys" },
+                                " --secret-key ", { "Fn::GetAtt": [ "CFNKeys", "SecretAccessKey" ] }, "\n"
+                            ]
+                        ]
+                    }
+                },
+                "KeyName": { "Ref" : "KeyName" },
+                "SecurityGroups": [
+                    {
+                        "Ref": "PuppetMasterSecurityGroup"
+                    }
+                ],
+                "InstanceType": "t1.micro",
+                "ImageId": { "Ref" : "AMI" }<co id="linux_ami_id_co" />
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "config": {
+                        "files": {<co id="config_files_co" />
+                            "/etc/puppet/autosign.conf": {
+                                "content": "*.internal\n",
+                                "owner": "root",
+                                "group": "wheel",
+                                "mode": "100644"
+                            },
+                            "/etc/puppet/manifests/site.pp": {
+                                "content": "import \"nodes\"\n",
+                                "owner": "root",
+                                "group": "wheel",
+                                "mode": "100644"
+                            },
+                            "/etc/puppet/manifests/nodes.pp": {
+                                "content": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "node basenode {\n",
+                                            " include cfn\n",
+                                            "}\n",
+                                            "node /^.*internal$/ inherits basenode {\n",
+                                            "}\n"
+                                        ]
+                                    ]
+                                },
+                                "owner": "root",
+                                "group": "wheel",
+                                "mode": "100644"
+                            },
+                            "/etc/puppet/modules/cfn/lib/facter/cfn.rb": {
+                                "owner": "root",
+                                "source": "https://s3.amazonaws.com/cloudformation-examples/cfn-facter-plugin.rb",
+                                "group": "wheel",
+                                "mode": "100644"
+                            },
+                            "/etc/yum.repos.d/epel.repo": {
+                                "owner": "root",
+                                "source": "https://s3.amazonaws.com/cloudformation-examples/enable-epel-on-amazon-linux-ami",
+                                "group": "root",
+                                "mode": "000644"
+                            },
+                            "/etc/puppet/fileserver.conf": {
+                                "content": "[modules]\n allow *.internal\n",
+                                "owner": "root",
+                                "group": "wheel",
+                                "mode": "100644"
+                            },
+                            "/etc/puppet/puppet.conf": {
+                                "content": {<co id="file_content_co" />
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "[main]\n",
+                                            " logdir=/var/log/puppet\n",
+                                            " rundir=/var/run/puppet\n",
+                                            " ssldir=$vardir/ssl\n",
+                                            " pluginsync=true\n",
+                                            "[agent]\n",
+                                            " classfile=$vardir/classes.txt\n",
+                                            " localconfig=$vardir/localconfig\n"
+                                        ]
+                                    ]
+                                },
+                                "owner": "root",
+                                "group": "root",
+                                "mode": "000644"
+                            },
+                            "/etc/puppet/modules/cfn/manifests/init.pp": {
+                                "content": "class cfn {}",
+                                "owner": "root",
+                                "group": "wheel",
+                                "mode": "100644"
+                            }
+                        },
+                        "packages": {<co id="config_packages_co" />
+                            "rubygems": {
+                                "json": []
+                            },
+                            "yum": {
+                                "gcc": [],
+                                "rubygems": [],
+                                "ruby-devel": [],
+                                "make": [],
+                                "puppet-server": [],
+                                "puppet": []
+                            }
+                        },
+                        "services": {<co id="config_services_co" />
+                            "sysvinit": {
+                                "puppetmaster": {
+                                    "ensureRunning": "true",
+                                    "enabled": "true"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "Outputs": {<co id="ouputs_co" />
+        "PuppetMasterDNSName": {
+            "Description": "Private DNS Name of PuppetMaster",
+            "Value": {
+                "Fn::GetAtt": [ "PuppetMasterInstance", "PrivateDnsName" ]
+            }
+        },
+        "PuppetClientSecurityGroup": {
+            "Description": "Name of the Puppet client Security Group",
+            "Value": { "Ref" : "PuppetClientSecurityGroup" }
+        }
+    }
+}
