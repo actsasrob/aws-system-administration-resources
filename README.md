@@ -29,7 +29,12 @@ The above CloudFormation template and bash script map to the **"Master-less Pupp
 Setup CentOS 7 host with cfn-bootstrap python packages installed to support using of CloudFormation cfn-init, 
 cfn-hup, etc helper scripts.
 
-TODO:
-Update ch04/puppet_client_masterless_cloudformation.json to use amazon linux or CentOS7 instance and pull down Puppet4 repo from puppetlabs
+Credit to [cgswong](https://gist.github.com/cgswong/1ab591eaf813f987622dc2dab9a54648)
 
+ch04 TODO:
+* Provide working Puppet client/master CloudFormation templates???
 
+** ch05
+
+ch05 TODO:
+* Provide working CloudFormation templates for chapter 5.
