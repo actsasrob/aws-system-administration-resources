@@ -1,0 +1,254 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Example Puppet masterless stack",
+	"Parameters": {
+		"KeyName": {
+			"Description": "EC2 KeyPair name",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "255",
+			"AllowedPattern": "[\\x20-\\x7E]*",
+			"ConstraintDescription": "can contain only ASCII characters."
+		},
+		"AMI": {
+			"Description": "AMI ID",
+			"Type": "String"
+		}
+	},
+	"Resources": {
+		"CFNKeys": {
+			"Type": "AWS::IAM::AccessKey",
+			"Properties": {
+				"UserName": {
+					"Ref": "CFNInitUser"
+				}
+			}
+		},
+		"CFNInitUser": {
+			"Type": "AWS::IAM::User",
+			"Properties": {
+				"Policies": [
+					{
+						"PolicyName": "AccessForCFNInit",
+						"PolicyDocument": {
+							"Statement": [
+								{
+									"Action": "cloudformation:DescribeStackResource",
+									"Resource": "*",
+									"Effect": "Allow"
+								}
+							]
+						}
+					}
+				]
+			}
+		},
+		"NginxGroup": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"SecurityGroupIngress": [
+					{
+						"ToPort": "22",
+						"IpProtocol": "tcp",
+						"CidrIp": "0.0.0.0/0",
+						"FromPort": "22"
+					},
+					{
+						"ToPort": "80",
+						"IpProtocol": "tcp",
+						"CidrIp": "0.0.0.0/0",
+						"FromPort": "80"
+					}
+				],
+				"GroupDescription": "Security Group for managed Nginx"
+			}
+		},
+		"NginxInstance": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"InstanceType": "t2.micro",
+				"SecurityGroups": [
+					{
+						"Ref": "NginxGroup"
+					}
+				],
+				"KeyName": {
+					"Ref": "KeyName"
+				},
+				"ImageId": {
+					"Ref": "AMI"
+				},
+				"UserData": {
+					"Fn::Base64": {
+						"Fn::Join": [
+							"",
+							[
+								"#!/bin/bash -xe\n",
+								"# Install EPEL Repo:",
+								"\n",
+								"yum -y install epel-release",
+								"\n\n",
+								"# Install python-pip:",
+								"\n",
+								"yum -y install python-pip",
+								"\n\n",
+								"# Install Python add-ons:",
+								"\n",
+								"pip install pystache",
+								"\n",
+								"pip install argparse",
+								"\n",
+								"pip install python-daemon",
+								"\n",
+								"pip install requests",
+								"\n\n",
+								"# Yum Update:",
+								"\n",
+								"#yum -y update",
+								"\n\n",
+								"# Install CFN-BootStrap",
+								"\n",
+								"cd /opt",
+								"\n",
+								"curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
+								"\n",
+								"tar -xvpf aws-cfn-bootstrap-latest.tar.gz",
+								"\n",
+								"cd aws-cfn-bootstrap-1.4/",
+								"\n",
+								"python setup.py build",
+								"\n",
+								"python setup.py install",
+								"\n\n",
+								"# Configure CFN",
+								"\n",
+								"ln -s /usr/init/redhat/cfn-hup /etc/init.d/cfn-hup",
+								"\n",
+								"chmod 775 /usr/init/redhat/cfn-hup",
+								"\n",
+								"cd /opt",
+								"\n",
+								"mkdir aws",
+								"\n",
+								"cd aws",
+								"\n",
+								"mkdir bin",
+								"\n",
+								"ln -s /usr/bin/cfn-hup /opt/aws/bin/cfn-hup",
+								"\n\n",
+								"ln -s /usr/bin/cfn-init /opt/aws/bin/cfn-init",
+								"\n\n",
+								"/opt/aws/bin/cfn-init --region ",
+								{
+									"Ref": "AWS::Region"
+								},
+								" -s ",
+								{
+									"Ref": "AWS::StackName"
+								},
+								" -r NginxInstance ",
+								" --configsets installset ",
+								" --access-key ",
+								{
+									"Ref": "CFNKeys"
+								},
+								" --secret-key ",
+								{
+									"Fn::GetAtt": [
+										"CFNKeys",
+										"SecretAccessKey"
+									]
+								},
+								"\n",
+								"rpm -Uvh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm",
+								"\n",
+								"yum -y install puppet-agent",
+								"\n",
+								"mv -f /tmp/puppet.conf /etc/puppetlabs/puppet/puppet.conf",
+								"\n",
+								"mv -f /tmp/site.pp /etc/puppetlabs/code/environments/production/manifests/site.pp",
+								"\n",
+								". /etc/profile.d/puppet-agent.sh",
+								"\n",
+								"puppet apply /etc/puppetlabs/code/environments/production/manifests/site.pp",
+								"\n"
+							]
+						]
+					}
+				}
+			},
+			"Metadata": {
+				"AWS::CloudFormation::Init": {
+					"configSets": {
+						"installset": [
+							"Install"
+						]
+					},
+					"Install": {
+						"packages": {
+							"yum": {
+							},
+							"rubygems": {
+								"json": [
+								]
+							}
+						},
+						"files": {
+							"/tmp/puppet.conf": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"[main]\n",
+											" logdir=/var/log/puppet\n",
+											" rundir=/var/run/puppet\n",
+											" ssldir=$vardir/ssl\n",
+											"[agent]\n",
+											" classfile=$vardir/classes.txt\n",
+											" localconfig=$vardir/localconfig\n"
+										]
+									]
+								},
+								"mode": "000644",
+								"owner": "root",
+								"group": "root"
+							},
+							"/tmp/site.pp": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"node default {\n",
+											" package { 'nginx':\n",
+											" ensure => present\n",
+											" }\n\n",
+											" service { 'nginx':\n",
+											" ensure => running,\n",
+											" require=> Package['nginx']\n",
+											" }\n",
+											"}\n"
+										]
+									]
+								},
+								"mode": "000644",
+								"owner": "root",
+								"group": "wheel"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"Outputs": {
+		"NginxDNSName": {
+			"Value": {
+				"Fn::GetAtt": [
+					"NginxInstance",
+					"PublicDnsName"
+				]
+			},
+			"Description": "DNS Name of Nginx managed instance"
+		}
+	}
+}
