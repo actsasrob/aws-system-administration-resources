@@ -14,7 +14,8 @@ The CloudFormation scripts below, provided by the book authors, demonstrate usin
 
 ### packer_example
 packer_example directory contains a working example of using packer to build an AMI image with puppet 4.x packages pre-installed and with a site.pp manifest and nginx module definition to install nginx as the default node type. The base AMI Ubuntu 17.10 "yakkety yak" is used because there is a puppetlabs repo available that provides Puppet 4.x packages.
-The contents of the packer_example directory coincides with the content found in the **"Building AMIs with Packer"** section of Chapter 4 of the book.
+
+The contents of the packer_example directory map to the content found in the **"Building AMIs with Packer"** section of Chapter 4 of the book.
 
 ### Puppet masterless client example
 
