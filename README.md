@@ -31,10 +31,15 @@ cfn-hup, etc helper scripts.
 
 Credit to [cgswong](https://gist.github.com/cgswong/1ab591eaf813f987622dc2dab9a54648)
 
-ch04 TODO:
+### ch04 TODO:
 * Provide working Puppet client/master CloudFormation templates???
 
-** ch05
+## ch05
 
-ch05 TODO:
+For chapter 5 I will attempt to provide working AWS CloudFormation and puppet manifests/modules that map to the running example in chapter 5. My plan is to stick to the spirit of the examples in the book as close as possible. Puppet manifests/modules will be updated to use Puppet v4.x. I believe the intent of the authors was to use masterless Puppet for the examples. 'puppet install' will be used for installation of standard puppet modules that reside in PuppetForge and pull custom puppet modules using 'git clone'.
+
+To help map content in this git repository to the book I'll name the directories to be the same as the numbered examples in the book. For example, the directory named **example_5-9** maps to the Puppet modules/AWS CloudFormation scripts for Example 5-9.
+
+### ch05 TODO:
 * Provide working CloudFormation templates for chapter 5.
+

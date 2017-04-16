@@ -8,7 +8,6 @@ fi
 
 # NOTE: el7 puppetlabs repo puppet-agent package requires systemd. Use RHEL7/CentOS7 AMI
 # dcos-centos7-201703282212 - ami-0652eb10
-# Codenvy_Centos7_1_AMI-launch-v3.13.4.4-1-HVM - ami-0889df62
 aws cloudformation create-stack --stack-name puppet-client-masterless --template-body \
 file://puppet_client_masterless_cloudformation.json \
 --region us-east-1 --capabilities CAPABILITY_IAM \
