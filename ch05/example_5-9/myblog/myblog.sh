@@ -14,10 +14,10 @@ file://cloudformation/myblog.json \
 ParameterKey=KeyName,ParameterValue=RobertHughes)
 
 if [ "$?" -eq 0 ]; then
-   stackid=$(echo "$output" | grep "StackId" | awk '{ print $2 }')
-   echo "info: waiting for stack creation to complete..."
-   aws cloudformation wait stack-create-complete --stack-name "$stackid"
+   stackid=$(echo "$output" | grep "StackId" | awk '{ print $2 }' | tr -d '"')
+   echo "info: waiting for stack creation to complete for stack ID ${stackid}..."
+   aws cloudformation wait stack-create-complete --stack-name $stackid
 else
-   echo "error: non-zero result returned from 'aws cloudformation command'"
+   echo "error: non-zero result returned from 'aws cloudformation' command"
 fi
 
