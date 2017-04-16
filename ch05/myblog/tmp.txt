@@ -1,0 +1,21 @@
+http://enthused.btr3.com/2016/06/howto-aws-and-masterless-puppet-on.html
+
+First Round: 
+ - Overview 
+  -- Use 'puppet install', and git clone to install puppet modules
+  -- Use CF with userdata to set roles
+  -- Use puppet apply to converge server. Let userdata roles drive appropriate packages to be installed.
+- Use CF to install Puppet packages
+- Use puppet command to install modules available via PuppetForge
+ -- stdlib, supervisor
+- Use git to clone modules not available in PuppetForge
+- Use git to clone custom puppet modules. 
+ -- myblog, celery
+- Copy modules from git clone into appropriate Puppet modules directory
+
+
+Round Two: 
+- Overview
+ -- Use r10k with puppet masterless
+ -- Use CF. Used EC2 tags and create custom Factor facts to set server roles
+ -- Use puppet apply to converge server. Let factor role facts drive appropriate packages to be installed.
