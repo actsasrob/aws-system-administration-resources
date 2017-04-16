@@ -40,6 +40,16 @@ For chapter 5 I will attempt to provide working AWS CloudFormation and puppet ma
 
 To help map content in this git repository to the book I'll name the directories to be the same as the numbered examples in the book. For example, the directory named **example_5-9** maps to the Puppet modules/AWS CloudFormation scripts for Example 5-9.
 
+### example_5-9
+
+Remember to use "ubuntu" user to ssh into EC2 instance.
+
 ### ch05 TODO:
 * Provide working CloudFormation templates for chapter 5.
+
+## Misc
+```
+curl http://169.254.169.254/latest/user-data
+curl http://169.254.169.254/latest/meta-data
+```
 
