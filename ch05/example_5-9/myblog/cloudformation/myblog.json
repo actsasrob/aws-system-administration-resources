@@ -3,8 +3,11 @@
 	"Description": "Mezzanine-powered blog, served with Nginx.",
 	"Parameters": {
 		"KeyName": {
-			"Description": "Name of an existing EC2 KeyPair to enable SSH access to the
-instance",
+			"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+			"Type": "String"
+		},
+		"AMI": {
+			"Description": "AMI ID",
 			"Type": "String"
 		}
 	},
@@ -12,6 +15,7 @@ instance",
 		"WebInstance": {
 			"Type": "AWS::EC2::Instance",
 			"Properties": {
+"InstanceType": "t2.micro",
 				"SecurityGroups": [
 					{
 						"Ref": "WebSecurityGroup"
@@ -20,7 +24,9 @@ instance",
 				"KeyName": {
 					"Ref": "KeyName"
 				},
-				"ImageId": "ami-12345678",
+				"ImageId": {
+					"Ref": "AMI"
+				},
 				"UserData": {
 					"Fn::Base64": {
 						"Fn::Join": [
@@ -33,6 +39,7 @@ instance",
 						]
 					}
 				}
+}
 			},
 			"WebSecurityGroup": {
 				"Type": "AWS::EC2::SecurityGroup",
@@ -55,4 +62,4 @@ instance",
 				}
 			}
 		}
-	}
+}
