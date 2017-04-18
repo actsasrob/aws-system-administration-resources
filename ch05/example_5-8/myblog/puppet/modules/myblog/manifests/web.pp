@@ -2,7 +2,7 @@
 
 class myblog::web {
   Class["myblog::web"] -> Class["myblog"]
-  require myblog::mynginx
+  include myblog::mynginx
   supervisor::service { "myblog_web":
     ensure => present,
     enable => true,
