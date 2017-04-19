@@ -6,7 +6,7 @@ class myblog::mynginx {
   }
 
   nginx::resource::vhost { "blog.example.com":
-    ensure => enable,
+    ensure => present,
     listen_options => "default",
     proxy => "http://myblog_app"
   }

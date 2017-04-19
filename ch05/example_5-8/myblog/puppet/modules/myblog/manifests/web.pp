@@ -1,8 +1,11 @@
 #include myblog::mynginx
 
 class myblog::web {
-  Class["myblog::web"] -> Class ["myblog::create_project"] -> Class["myblog"]
+  include  myblog::create_project,myblog
+  Class['myblog'] -> Class['myblog::create_project'] -> Class['myblog::web']
+
   include myblog::mynginx
+
   #supervisord::service { "myblog_web":
   #  ensure => present,
   #  enable => true,
