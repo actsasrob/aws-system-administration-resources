@@ -45,6 +45,12 @@ To help map content in this git repository to the book I'll name the directories
 Remember to use "ubuntu" user to ssh into EC2 instance.
 
 ### ch05 TODO:
+* Need to update the ALLOWED_HOSTS line in /srv/myblog/myblog/settings.py to allow "*"
+  * change:
+  * ALLOWED_HOSTS = []
+  * to 
+  * ALLOWED_HOSTS = "*"
+  * see https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 * Provide working CloudFormation templates for chapter 5.
 
 ## Misc
