@@ -1,5 +1,5 @@
 class myblog::requirements {
-  $packages = ["python-dev", "python-pip", "libtiff5-dev", "libjpeg8-dev", "zlib1g-dev", "libfreetype6-dev"] 
+  $packages = ["python-dev", "python-pip", "libjpeg8", "libjpeg8-dev", "libtiff5-dev", "zlib1g-dev", "libfreetype6-dev", "python-imaging"] 
   package { $packages:
     ensure => installed
   }
@@ -15,7 +15,7 @@ class myblog::requirements {
     ensure => present
   }
 
-  file { "${myblog::app_path}/${myblog::app_name}":
+  file { "${myblog::app_path}":
     ensure => "directory",
     owner => "mezzanine",
     group => "mezzanine"

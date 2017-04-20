@@ -1,4 +1,6 @@
-class myblog::create_project {
+lass myblog::create_project {
+  include myblog
+
   notify { 'mezzanine_project_info':
      message => "mezzine project name: ${myblog::app_name} project dir: ${myblog::app_path}",
   }
@@ -7,7 +9,7 @@ class myblog::create_project {
   exec { "init-mezzanine-project":
     command => "/usr/local/bin/mezzanine-project ${myblog::app_name} ${myblog::app_path}",
     user => "mezzanine",
-    creates => "${myblog::app_path}/${myblog::app_name}/__init__.py",
+    creates => "${myblog::app_path}/__init__.py",
     notify => Exec["init-mezzanine-db"],
   }
 
