@@ -1,4 +1,4 @@
-lass myblog::create_project {
+class myblog::create_project {
   include myblog
 
   notify { 'mezzanine_project_info':
