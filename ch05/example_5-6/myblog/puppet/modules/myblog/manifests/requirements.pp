@@ -15,7 +15,7 @@ class myblog::requirements {
     ensure => present
   }
 
-  file { "$myblog::app_path":
+  file { "${myblog::app_path}/${myblog::app_name}":
     ensure => "directory",
     owner => "mezzanine",
     group => "mezzanine"
