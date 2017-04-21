@@ -88,13 +88,17 @@ wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
 ```
 
 3. Clone the git project
+```
    cd 
    git clone https://github.com/actsasrob/aws-system-administration-resources.git
    cd aws-system-administration-resources/ch05/example_5-8
+```
 
 4. Install standard puppet modules from PuppetForge and custom puppet modules
+
    Edit TARGET_PATH variable in install_files script to point to desired puppet module path
-   ./install_files.sh
+
+    ./install_files.sh
 
    **NOTE:** The install_files.sh script will output the command to run in the next step.
 
@@ -106,8 +110,10 @@ Second method to test using Vagrant
 1. Install vagrant and add box for 'ubuntu/yakkety64'.
 2. Install this git project:
 
+```
 git clone https://github.com/actsasrob/aws-system-administration-resources.git
 cd aws-system-administration-resources
+```
 
 3. Launch the virtual machine using vgrant
 
