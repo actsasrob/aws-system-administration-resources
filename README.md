@@ -70,9 +70,9 @@ Add puppet/modules/myblog/manifests/web.pp manifest to define myblog::web class.
 
 At this point enough of the myblog module has been defined to allow the mezzanine project to be created using masterless puppet on an Ubuntu 16.10 "yakkety yak" server.
 
-First method to test without using AWS/EC2:
+#### First method to test without using AWS/EC2:
 1. Create an ubuntu 16.10 server/VM. Log into server.
-2. Install puppet agent
+2. Install puppet agent:
 
 ```
 wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
@@ -87,16 +87,16 @@ wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
   echo ". /etc/profile.d/puppet-agent.sh" >> ~/.bashrc
 ```
 
-3. Clone the git project
+3. Clone the git project:
 ```
    cd 
    git clone https://github.com/actsasrob/aws-system-administration-resources.git
    cd aws-system-administration-resources/ch05/example_5-8
 ```
 
-4. Install standard puppet modules from PuppetForge and custom puppet modules
+4. Install standard puppet modules from PuppetForge and custom puppet modules:
 
-   Edit TARGET_PATH variable in install_files script to point to desired puppet module path
+   Edit TARGET_PATH variable in install_files.sh script to point to desired puppet module path and then execute installfiles.sh.
 
     ./install_files.sh
 
@@ -106,7 +106,7 @@ wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
 
 6. Navigate to application in browser: http://192.168.250.11
 
-Second method to test using Vagrant
+####Second method to test using Vagrant.
 1. Install vagrant and add box for 'ubuntu/yakkety64'.
 2. Install this git project:
 
@@ -115,7 +115,7 @@ git clone https://github.com/actsasrob/aws-system-administration-resources.git
 cd aws-system-administration-resources
 ```
 
-3. Launch the virtual machine using vgrant
+3. Launch the virtual machine using vgrant:
 
 This will install the puppet agent, install all necessary standard puppet modules, install the custom myblog puppet module and manifest files, then run 'puppet apply' command to converge server.
 ```vagrant up example_5_8
