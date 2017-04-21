@@ -14,9 +14,9 @@ class myblog::create_project {
   }
 
   file_line { 'settingspy_allowed_hosts':
-    path  => "${myblog::app_path}/${myblog::app_name}/settings.py", 
-    line => 'ALLOWD_HOSTS = "*"',
-    match  => 'ALLOWED_HOSTS = []',
+    path  => "${myblog::app_path}/${myblog::app_name}/settings.py",
+    line => 'ALLOWED_HOSTS = "*"',
+    match  => 'ALLOWED_HOSTS = \[\]',
   }
 
   # Create the development SQLite database
