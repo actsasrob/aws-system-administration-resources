@@ -36,13 +36,13 @@ Credit to [cgswong](https://gist.github.com/cgswong/1ab591eaf813f987622dc2dab9a5
 
 ## ch05
 
-For chapter 5 I will attempt to provide working AWS CloudFormation and puppet manifests/modules that map to the running example in chapter 5. My plan is to stick to the spirit of the examples in the book as close as possible. Puppet manifests/modules will be updated to use Puppet v4.x. I believe the intent of the authors was to use masterless Puppet for the examples. 'puppet install' will be used for installation of standard puppet modules that reside in PuppetForge and pull custom puppet modules using 'git clone'.
+For chapter 5 I will attempt to provide working AWS CloudFormation and puppet manifests/modules that map to the running example in chapter 5. My plan is to stick to the spirit of the examples in the book as close as possible. Puppet manifests/modules will be updated to use Puppet v4.x. I believe the intent of the authors was to use masterless Puppet for the examples. 'puppet module install' will be used for installation of standard puppet modules that reside in PuppetForge and pull custom puppet modules using 'git clone'.
 
 To help map content in this git repository to the book I'll name the directories to be the same as the numbered examples in the book. For example, the directory named **example_5-9** maps to the Puppet modules/AWS CloudFormation scripts for Example 5-9.
 
-**NOTE:** The mezzanine project now resides in /srv/myblog/mblog. The settings.py and and local_settings.py files reside in /srv/myblog/myblog instead of /srv/myblog as indicated in the book. This was done to workaround permission problems creating the /srv/myblog directory as the 'mezzanine' user. Also the /usr/local/bin/mezzaine-project script fails if the project directory already exists. The /srv/blog directory is created and ownership set to the 'mazzanine' user. Later the mezzanine project is created in /srv/myblog/myblog.
+**NOTE:** The mezzanine project now resides in /srv/myblog/mblog. The settings.py and and local_settings.py files reside in /srv/myblog/myblog instead of /srv/myblog as indicated in the book. This was done to workaround permission problems creating the /srv/myblog directory as the 'mezzanine' user. Also the /usr/local/bin/mezzaine-project script fails if the project directory already exists. The /srv/blog directory is created and ownership set to the 'mezzanine' user. Later the mezzanine project is created in /srv/myblog/myblog.
 
-### examaple_5-3
+### example_5-3
 
 Add puppet/manifests/site.pp file to drive installation of myblog class. This manifest file should be used with AWS EC2 instances where the server role has been set using "user data".
 
@@ -68,11 +68,63 @@ Add puppet/modules/myblog/manifests/mynginx.pp manifest to install nginx and pro
 
 Add puppet/modules/myblog/manifests/web.pp manifest to define myblog::web class.
 
+At this point enough of the myblog module has been defined to allow the mezzanine project to be created using masterless puppet on an Ubuntu 16.10 "yakkety yak" server.
+
+First method to test without using AWS/EC2:
+1. Create an ubuntu 16.10 server/VM. Log into server.
+2. Install puppet agent
+
+```
+wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
+  sudo dpkg -i puppetlabs-release-pc1-yakkety.deb
+  sudo apt-get update
+  sudo apt-get -y install puppet-agent
+
+  sudo grep secure_path /etc/sudoers \
+  | sed -e 's#"$#:/opt/puppetlabs/bin"#' \
+  | sudo tee /etc/sudoers.d/puppet-securepath
+
+  echo ". /etc/profile.d/puppet-agent.sh" >> ~/.bashrc
+```
+
+3. Clone the git project
+   cd 
+   git clone https://github.com/actsasrob/aws-system-administration-resources.git
+   cd aws-system-administration-resources/ch05/example_5-8
+
+4. Install standard puppet modules from PuppetForge and custom puppet modules
+   Edit TARGET_PATH variable in install_files script to point to desired puppet module path
+   ./install_files.sh
+
+   **NOTE:** The install_files.sh script will output the command to run in the next step.
+
+5. Run 'puppet apply' command to converge server and install myblog application.
+
+6. Navigate to application in browser: http://192.168.250.11
+
+Second method to test using Vagrant
+1. Install vagrant and add box for 'ubuntu/yakkety64'.
+2. Install this git project:
+
+git clone https://github.com/actsasrob/aws-system-administration-resources.git
+cd aws-system-administration-resources
+
+3. Launch the virtual machine using vgrant
+
+This will install the puppet agent, install all necessary standard puppet modules, install the custom myblog puppet module and manifest files, then run 'puppet apply' command to converge server.
+```vagrant up example_5_8
+```
+
+4. Navigate to application in browser: http://192.168.250.11
+
+
+
 ### example_5-9
 
 Provide working CloudFormation template and CLI script to create AWS EC2 instance for application.
 * myblog/cloudformation/myblog.json - CloudFormation template.
-* myblog.sh - Bash script which invokes 'aws cloudformation' CLI to create EC2 instance using CloudFormation template. **NOTE:** Costs will be incurred for creating AWS resources!!!**
+* myblog.sh - Bash script which invokes 'aws cloudformation' CLI to create EC2 instance using CloudFormation template. _**NOTE: Costs will be incurred for creating AWS resources!!!**_
+* Consistent with the content in the book masterless puppet is not yet integrated to install the application.
 
 **NOTE:** Remember to use "ubuntu" user to ssh into EC2 instance.
 
