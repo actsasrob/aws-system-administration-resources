@@ -40,17 +40,44 @@ For chapter 5 I will attempt to provide working AWS CloudFormation and puppet ma
 
 To help map content in this git repository to the book I'll name the directories to be the same as the numbered examples in the book. For example, the directory named **example_5-9** maps to the Puppet modules/AWS CloudFormation scripts for Example 5-9.
 
+**NOTE:** The mezzanine project now resides in /srv/myblog/mblog. The settings.py and and local_settings.py files reside in /srv/myblog/myblog instead of /srv/myblog as indicated in the book. This was done to workaround permission problems creating the /srv/myblog directory as the 'mezzanine' user. Also the /usr/local/bin/mezzaine-project script fails if the project directory already exists. The /srv/blog directory is created and ownership set to the 'mazzanine' user. Later the mezzanine project is created in /srv/myblog/myblog.
+
+### examaple_5-3
+
+Add puppet/manifests/site.pp file to drive installation of myblog class. This manifest file should be used with AWS EC2 instances where the server role has been set using "user data".
+
+Added extra puppet/manifests/site_notec2.pp file that can be used to test installation when not using AWS EC2.
+
+### example_5-4
+
+Add puppet/modules/myblog/manifests/init.pp manifest to initialize myblog module.
+
+### example_5-5
+
+Add puppet/modules/myblog/manifests/requirements.pp to handle application requirements.
+
+### example_5-6
+
+Add puppet/modules/myblog/manifests/create_project.pp manifest to create mezzaine project and database.
+
+### example_5-7
+
+Add puppet/modules/myblog/manifests/mynginx.pp manifest to install nginx and proxy to mezzanine application.
+
+### example_5-8
+
+Add puppet/modules/myblog/manifests/web.pp manifest to define myblog::web class.
+
 ### example_5-9
 
-Remember to use "ubuntu" user to ssh into EC2 instance.
+Provide working CloudFormation template and CLI script to create AWS EC2 instance for application.
+* myblog/cloudformation/myblog.json - CloudFormation template.
+* myblog.sh - Bash script which invokes 'aws cloudformation' CLI to create EC2 instance using CloudFormation template. **NOTE:** Costs will be incurred for creating AWS resources!!!**
+
+**NOTE:** Remember to use "ubuntu" user to ssh into EC2 instance.
 
 ### ch05 TODO:
-* Need to update the ALLOWED_HOSTS line in /srv/myblog/myblog/settings.py to allow "*"
-  * change:
-  * ALLOWED_HOSTS = []
-  * to 
-  * ALLOWED_HOSTS = "*"
-  * see https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
+* Provide working CloudFormation + masterless puppet example after example 5-9
 * Provide working CloudFormation templates for chapter 5.
 
 ## Misc
