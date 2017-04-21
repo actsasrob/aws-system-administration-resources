@@ -13,6 +13,12 @@ class myblog::create_project {
     notify => Exec["init-mezzanine-db"],
   }
 
+  file_line { 'settingspy_allowed_hosts':
+    path  => "${myblog::app_path}/${myblog_appname}/settings.py" 
+    line  => 'ALLOWED_HOSTS = []',
+    match => 'ALLOWD_HOSTS = "*"',
+  }
+
   # Create the development SQLite database
   exec { "init-mezzanine-db":
     command => "/usr/bin/python manage.py createdb --noinput",
