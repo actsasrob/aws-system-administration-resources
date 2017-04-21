@@ -19,6 +19,11 @@ $ubuntu_setupscript = <<END
 
   echo ". /etc/profile.d/puppet-agent.sh" >> ~/.bashrc
 
+  sudo apt-get -y install tree
+
+  echo "Checking out aws-system-administration-resources git project..."
+  git clone https://github.com/actsasrob/aws-system-administration-resources.git
+
   echo 'done.'
 END
 
