@@ -106,7 +106,7 @@ wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
 
 6. Navigate to application in browser: http://192.168.250.11
 
-####Second method to test using Vagrant.
+#### Second method to test, without using AWS EC2, but using Vagrant.
 1. Install vagrant and add box for 'ubuntu/yakkety64'.
 2. Install this git project:
 
@@ -115,10 +115,11 @@ git clone https://github.com/actsasrob/aws-system-administration-resources.git
 cd aws-system-administration-resources
 ```
 
-3. Launch the virtual machine using vgrant:
+3. Launch the virtual machine using vagrant:
 
 This will install the puppet agent, install all necessary standard puppet modules, install the custom myblog puppet module and manifest files, then run 'puppet apply' command to converge server.
-```vagrant up example_5_8
+```
+vagrant up example_5_8
 ```
 
 4. Navigate to application in browser: http://192.168.250.11
