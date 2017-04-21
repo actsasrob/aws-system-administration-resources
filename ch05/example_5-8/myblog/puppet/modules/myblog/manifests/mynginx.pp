@@ -1,13 +1,1 @@
-class myblog::mynginx {
-  class { "nginx": }
-  nginx::resource::upstream { "myblog_app":
-    ensure => present,
-    members => [ 'localhost:8000', ]
-  }
-
-  nginx::resource::vhost { "blog.example.com":
-    ensure => present,
-    listen_options => "default",
-    proxy => "http://myblog_app"
-  }
-}
+../../../../../../example_5-7/myblog/puppet/modules/myblog/manifests/mynginx.pp
