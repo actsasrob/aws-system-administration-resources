@@ -86,7 +86,7 @@
 								{
 									"Fn::GetAtt": [
 										"BlogDB",
-										"End-point.Address"
+										"Endpoint.Address"
 									]
 								},
 								"\",",
