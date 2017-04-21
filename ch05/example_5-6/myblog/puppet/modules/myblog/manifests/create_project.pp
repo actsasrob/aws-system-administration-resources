@@ -14,7 +14,7 @@ class myblog::create_project {
   }
 
   file_line { 'settingspy_allowed_hosts':
-    path  => "${myblog::app_path}/${myblog_appname}/settings.py" 
+    path  => "${myblog::app_path}/${myblog_appname}/settings.py", 
     line  => 'ALLOWED_HOSTS = []',
     match => 'ALLOWD_HOSTS = "*"',
   }
