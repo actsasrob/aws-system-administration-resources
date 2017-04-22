@@ -1,0 +1,77 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Mezzanine-powered blog, served with Nginx.",
+	"Parameters": {
+		"KeyName": {
+			"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+			"Type": "String"
+		},
+		"AMI": {
+			"Description": "AMI ID",
+			"Type": "String"
+		}
+	},
+	"Resources": {
+		"WebInstance": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"InstanceType": "t2.micro",
+				"SecurityGroups": [
+					{
+						"Ref": "WebSecurityGroup"
+					}
+				],
+				"KeyName": {
+					"Ref": "KeyName"
+				},
+				"ImageId": {
+					"Ref": "AMI"
+				},
+				"UserData": {
+					"Fn::Base64": {
+						"Fn::Join": [
+							"",
+							[
+								"{\n",
+								"'role' : 'web',",
+								" 'role1' : 'db'\n",
+								"}"
+							]
+						]
+					}
+				}
+			}
+		},
+		"WebSecurityGroup": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"GroupDescription": "Allow SSH and HTTP from anywhere",
+				"SecurityGroupIngress": [
+					{
+						"IpProtocol": "tcp",
+						"FromPort": "22",
+						"ToPort": "22",
+						"CidrIp": "0.0.0.0/0"
+					},
+					{
+						"IpProtocol": "tcp",
+						"FromPort": "80",
+						"ToPort": "80",
+						"CidrIp": "0.0.0.0/0"
+					}
+				]
+			}
+		}
+	},
+	"Outputs": {
+		"WebInstanceDNSName": {
+			"Value": {
+				"Fn::GetAtt": [
+					"WebInstance",
+					"PublicDnsName"
+				]
+			},
+			"Description": "DNS Name of Web managed instance"
+		}
+	}
+}
