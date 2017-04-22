@@ -27,6 +27,32 @@ $ubuntu_setupscript = <<END
   echo 'done.'
 END
 
+$ubuntu_setupscript_example_5_8 = <<END
+  echo 'setting up Ubuntu 16.10 yakkety yak...'
+  echo 'installing Puppet 4.x...'
+  wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
+  sudo dpkg -i puppetlabs-release-pc1-yakkety.deb
+  sudo apt-get update
+  sudo apt-get -y install puppet-agent
+
+  sudo grep secure_path /etc/sudoers \
+  | sed -e 's#"$#:/opt/puppetlabs/bin"#' \
+  | sudo tee /etc/sudoers.d/puppet-securepath
+
+  echo ". /etc/profile.d/puppet-agent.sh" >> ~/.bashrc
+
+  sudo apt-get -y install tree
+
+  echo "Checking out aws-system-administration-resources git project..."
+  git clone https://github.com/actsasrob/aws-system-administration-resources.git
+
+  cd aws-system-administration-resources/ch05/example_5-8
+  ./install_files.sh
+  sudo puppet apply /etc/puppetlabs/code/environments/production/manifests/site_notec2.pp
+ 
+  echo 'done.'
+END
+
 # Copy files into place
 $centos_setupscript = <<END
   # Hardlock domain name
@@ -75,6 +101,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     client.vm.hostname = "client.example.com"
     client.vm.network :private_network, ip: "192.168.250.10"
     client.vm.provision "shell", inline: $ubuntu_setupscript
+  end
+
+  config.vm.define "example_5_8", primary: true do |client|
+    client.vm.hostname = "client.example.com"
+    client.vm.network :private_network, ip: "192.168.250.11"
+    client.vm.provision "shell", inline: $ubuntu_setupscript_example_5_8
   end
 
   config.vm.define "client", primary: true do |client|
