@@ -13,7 +13,7 @@ file://cloudformation/myblog.json \
 --parameters ParameterKey=WebAMI,ParameterValue=ami-0f6fb419 \
 ParameterKey=CeleryAMI,ParameterValue=ami-0f6fb419 \
 ParameterKey=DBUser,ParameterValue="myblogdbuser" \
-ParameterKey=DBPassword,ParameterValue="password$1234" \
+ParameterKey=DBPassword,ParameterValue="password\$1234" \
 ParameterKey=KeyName,ParameterValue=RobertHughes)
 
 if [ "$?" -eq 0 ]; then
