@@ -17,6 +17,7 @@ class myblog::create_project {
     path  => "${myblog::app_path}/${myblog::app_name}/settings.py",
     line => 'ALLOWED_HOSTS = "*"',
     match  => 'ALLOWED_HOSTS = \[\]',
+    require => Exec["init-mezzanine-project"],
   }
 
   # Create the development SQLite database
