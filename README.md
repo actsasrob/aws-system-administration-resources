@@ -104,7 +104,7 @@ wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
 
 5. Run 'puppet apply' command to converge server and install myblog application.
 
-6. Navigate to application in browser: http://192.168.250.11
+6. Navigate to application in browser: http://<IP address>
 
 #### Second method to test, without using AWS EC2, but using Vagrant.
 1. Install vagrant and add box for 'ubuntu/yakkety64'.
@@ -131,6 +131,7 @@ vagrant up example_5_8
 Provide working CloudFormation template and CLI script to create AWS EC2 instance for application.
 * myblog/cloudformation/myblog.json - CloudFormation template.
 * myblog.sh - Bash script which invokes 'aws cloudformation' CLI to create EC2 instance using CloudFormation template. _**NOTE: Costs will be incurred for creating AWS resources!!!**_
+* _Before running the above script you must set up your AWS credentials in ~/.aws/credentials or via environment variables. Edit myblog.sh and change the KeyName parameter to use an appropriatekey name for your AWS account. Edit myblog.sh and select an AMI in the selected region running Ubuntu 16.10._
 * Consistent with the content in the book masterless puppet is not yet integrated to install the application.
 
 **NOTE:** Remember to use "ubuntu" user to ssh into EC2 instance.
