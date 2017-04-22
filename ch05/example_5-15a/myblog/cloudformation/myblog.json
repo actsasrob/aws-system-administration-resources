@@ -1,0 +1,138 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Mezzanine-powered blog, served with Nginx.",
+	"Parameters": {
+		"KeyName": {
+			"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+			"Type": "String"
+		},
+		"WebAMI": {
+			"Description": "AMI ID",
+			"Type": "String"
+		},
+		"CeleryAMI": {
+			"Type": "String"
+		},
+		"DBUser": {
+			"Type": "String"
+		},
+		"DBPassword": {
+			"Type": "String",
+			"NoEcho": "TRUE"
+		}
+	},
+	"Resources": {
+		"BlogDB": {
+			"Type": "AWS::RDS::DBInstance",
+			"Properties": {
+				"DBSecurityGroups": [
+					{
+						"Ref": "DBSecurityGroup"
+					}
+				],
+				"DBName": "myblog",
+				"AllocatedStorage": 5,
+				"DBInstanceClass": "db.t2.micro",
+				"Engine": "MySQL",
+				"EngineVersion": "5.6.27",
+				"MasterUsername": {
+					"Ref": "DBUser"
+				},
+				"MasterUserPassword": {
+					"Ref": "DBPassword"
+				}
+			},
+			"DeletionPolicy": "Snapshot"
+		},
+		"DBSecurityGroup": {
+			"Type": "AWS::RDS::DBSecurityGroup",
+			"Properties": {
+				"GroupDescription": "Allow inbound MySQL access from web instances",
+				"DBSecurityGroupIngress": [
+					{
+						"EC2SecurityGroupName": {
+							"Ref": "WebSecurityGroup"
+						}
+					}
+				]
+			}
+		},
+		"WebInstance": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"InstanceType": "t2.micro",
+				"SecurityGroups": [
+					{
+						"Ref": "WebSecurityGroup"
+					}
+				],
+				"KeyName": {
+					"Ref": "KeyName"
+				},
+				"ImageId": {
+					"Ref": "WebAMI"
+				},
+				"UserData": {
+					"Fn::Base64": {
+						"Fn::Join": [
+							"",
+							[
+								"{\n",
+								"'role' : 'web'\n",
+								"'db_endpoint': \"",
+								{
+									"Fn::GetAtt": [
+										"BlogDB",
+										"Endpoint.Address"
+									]
+								},
+								"\",",
+								" 'db_user': \"",
+								{
+									"Ref": "DBUser"
+								},
+								"\",",
+								" 'db_password': \"",
+								{
+									"Ref": "DBPassword"
+								},
+								"\" }"
+							]
+						]
+					}
+				}
+			}
+		},
+		"WebSecurityGroup": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"GroupDescription": "Allow SSH and HTTP from anywhere",
+				"SecurityGroupIngress": [
+					{
+						"IpProtocol": "tcp",
+						"FromPort": "22",
+						"ToPort": "22",
+						"CidrIp": "0.0.0.0/0"
+					},
+					{
+						"IpProtocol": "tcp",
+						"FromPort": "80",
+						"ToPort": "80",
+						"CidrIp": "0.0.0.0/0"
+					}
+				]
+			}
+		}
+	},
+	"Outputs": {
+		"WebInstanceDNSName": {
+			"Value": {
+				"Fn::GetAtt": [
+					"WebInstance",
+					"PublicDnsName"
+				]
+			},
+			"Description": "DNS Name of Web managed instance"
+		}
+	}
+}
