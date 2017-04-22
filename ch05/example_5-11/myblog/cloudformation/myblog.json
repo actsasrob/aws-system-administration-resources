@@ -78,8 +78,8 @@
 							"",
 							[
 								"{\n",
-								"'role' : 'web'\n",
-								"'db_endpoint': \"",
+								"'role' : 'web',",
+								" 'db_endpoint': \"",
 								{
 									"Fn::GetAtt": [
 										"BlogDB",
