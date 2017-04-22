@@ -78,8 +78,8 @@
 							"",
 							[
 								"{\n",
-								"'role' : 'web',",
-								" 'db_endpoint': \"",
+								"\"role\" : \"web\",",
+								" \"db_endpoint\": \"",
 								{
 									"Fn::GetAtt": [
 										"BlogDB",
@@ -87,17 +87,18 @@
 									]
 								},
 								"\",",
-								" 'db_user': \"",
+								" \"db_user\": \"",
 								{
 									"Ref": "DBUser"
 								},
 								"\",",
-								" 'db_password': \"",
+								" \"db_password\": \"",
 								{
 									"Ref": "DBPassword"
 								},
 								"\" }"
 							]
+
 						]
 					}
 				}
