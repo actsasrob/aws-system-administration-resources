@@ -40,13 +40,14 @@ $ubuntu_setupscript_example_5_8 = <<END
   | sudo tee /etc/sudoers.d/puppet-securepath
 
   echo ". /etc/profile.d/puppet-agent.sh" >> ~/.bashrc
+  source ~/.bashrc
 
   sudo apt-get -y install tree
 
   echo "Checking out aws-system-administration-resources git project..."
   git clone https://github.com/actsasrob/aws-system-administration-resources.git
 
-  cd aws-system-administration-resources/ch05/example_5-8
+  cd aws-system-administration-resources/ch05/example_5-8/myblog
   ./install_files.sh
   sudo puppet apply /etc/puppetlabs/code/environments/production/manifests/site_notec2.pp
  
