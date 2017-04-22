@@ -1,5 +1,5 @@
 node default {
-  $userdata = parsejson($ec2_userdata)
+  $userdata = parsejson($::ec2_userdata)
 
   # Set variables from userdata
   $role = $userdata['role']
