@@ -1,1 +1,0 @@
-../../../../../../example_5-12/myblog/puppet/modules/myblog/manifests/init.pp

@@ -9,8 +9,9 @@ sudo puppet module install ajcrowe-supervisord --version 0.6.1
 sudo puppet module install jfryman-nginx --version 0.3.0
 
 echo "Installing custom modules/manifests..."
-sudo mkdir -p $TARGET_DIR/modules/myblog/{manifests,modules}
+sudo mkdir -p $TARGET_DIR/modules/myblog/{manifests,modules,templates}
 sudo cp -f myblog/puppet/manifests/*.pp $TARGET_DIR/manifests
 sudo cp -f myblog/puppet/modules/myblog/manifests/*.pp $TARGET_DIR/modules/myblog/manifests
+sudo cp -f myblog/puppet/modules/myblog/templates/*.erb $TARGET_DIR/modules/myblog/templates
 
-echo "Puppet apply command: sudo puppet apply ${TARGET_DIR}/manifests/site_notec2.pp"
+echo "Puppet apply command: sudo puppet apply ${TARGET_DIR}/manifests/site.pp"

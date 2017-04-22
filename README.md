@@ -91,7 +91,7 @@ wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
 ```
    cd 
    git clone https://github.com/actsasrob/aws-system-administration-resources.git
-   cd aws-system-administration-resources/ch05/example_5-8
+   cd aws-system-administration-resources/ch05/example_5-8/myblog
 ```
 
 4. Install standard puppet modules from PuppetForge and custom puppet modules:
