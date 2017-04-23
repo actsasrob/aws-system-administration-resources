@@ -45,26 +45,26 @@ class myblog::create_project {
     notify => Exec["init-mezzanine-db"]
   }
 
-  file_line { 'local_settingspy_user':
+ file_line { 'local_settingspy_user':
     path  => "${myblog::app_path}/${myblog::app_name}/local_settings.py",
-    line => "        \"USER\": \"${myblog::db_user}\",",
-    match  => '^*"USER:"',
+    line => "       \"USER\": \"${myblog::db_user}\",",
+    match  => '^*"USER":',
     require => Exec["init-mezzanine-project"],
     notify => Exec["init-mezzanine-db"]
   }
 
   file_line { 'local_settingspy_password':
     path  => "${myblog::app_path}/${myblog::app_name}/local_settings.py",
-    line => "        \"PASSWORD\": \"${myblog::db_password}\",",
-    match  => '^*"PASSWORD:"',
+    line => "       \"PASSWORD\": \"${myblog::db_password}\",",
+    match  => '^*"PASSWORD":',
     require => Exec["init-mezzanine-project"],
     notify => Exec["init-mezzanine-db"]
   }
 
   file_line { 'local_settingspy_host':
     path  => "${myblog::app_path}/${myblog::app_name}/local_settings.py",
-    line => "        \"HOST\": \"${myblog::db_endpoint}\",",
-    match  => '^*"HOST:"',
+    line => "       \"HOST\": \"${myblog::db_endpoint}\",",
+    match  => '^*"HOST":',
     require => Exec["init-mezzanine-project"],
     notify => Exec["init-mezzanine-db"]
   }

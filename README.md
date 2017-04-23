@@ -136,8 +136,58 @@ Provide working CloudFormation template and CLI script to create AWS EC2 instanc
 
 **NOTE:** Remember to use "ubuntu" user to ssh into EC2 instance.
 
+### example_5-10
+
+The book shows how to update the local_settings.py file for the mezzanine project to point to an external AWS RDS database. No additional source code provided for this example.
+
+### example_5-11
+
+Update the myblog.json CloudFormation template to allow RDS database username and password to be passed as parameters to CloudFormation stack. These parameters are then used by CloudFormation to create an RDS MySQL database instance. The database name, username, and password are then set in the UserData properties and passed to the associated EC2 web tier instance to update the mezzanine database connection properties, via puppet, in /srv/myblog/myblog/local_settings.py to allow the mezzanine application to connect to the RDS instance.
+
+This example is not functional as the associated puppet modules need to be updated to take advantage of the properties passed to the EC2 instance via UserData.
+
+### example_5-12
+
+Update the Puppet myblog class definition in modules/myblog/manifests/init.pp to accept database connection parameters when class is declared.
+
+### example_5-13
+
+Update the puppet/manifests/site.pp file to read EC2 UserData, as JSON, and parse the JSON data into Puppet's internal hash format.
+
+Set myblog module variables to capture server role and various database connection parameters.
+
+### example_5-14
+
+Update the modules/myblog/manifests/create_project.pp manifest to use database connecton parameters, set in myblog class, to update mezzanine local_settings.py file to configure database connection parameters. The example in the book assumes the local_settings.py does not exist and then goes on to make use of the myblog/templates/local_settings.py.erb template file to create the local_settings.py file.
+
+However, what I found in practice is that a default local_settings.py file is created at the time the mezzanine project is created. My initial thought was to copy the local_settings.py file from a newly created mezzanine project and use it to create the local_settings.py.erb template. However the local_settings.py file contains a randomly generated secret. It would run counter to security to check this secret into version control. I will leave the source code for example 5-14 as specified in the book but will create an alternate implementation in example_5-14a to populate the local_settings.py file with updated database connection parameters.
+
+### example_5-15
+
+Contents of Puppet local_settings.py.erb template used to create contents of mezzanine project local_settings.py file specifying external database connection properties.
+
+
+### example_5-14a
+
+Alternative approach to populate external database connection properties to mezzanine project local_settings.py file using puppet "file_line" resource.
+
+**NOTE:** There is no example 5-14a counterpart in the book.
+
+### example5-15a
+
+Working example of Puppet myblog module and CloudFormation template to create RDS MySQL database instance for mezzanine project and EC2 web-tier instance running Nginx proxy to mezzanine application. This example uses the example 5-14a implementation to populate the mezzanine local_settings.py file with database connection parameters.
+
+**NOTE:** There is no example 5-15a counterpart in the book.
+
+My initial plan for this example was to install the Puppet agent, standard Puppet modules, and custom myblog Puppet module at instance boot time. However the approach in the book is to pass the server role and RDS database connection parameters to the web-tier EC2 instance via EC2 UserData. I don't believe you can pass both role(s) and a shell script (to build out the server) via UserData. If UserData is used to pass role(s) then another mechanism is needed to install Puppet and needed Puppet modules.
+
+I will take the approach to use packer to build a custom AMI which will install the latest Puppet agent, install standard Puppet modules, and then use git to clone the myblog Puppet module, then move the myblog manifest files into place. A custom /etc/rc.local script will be installed to run the 'puppet agent' command after the server boots to converge the server.
+
+
 ### ch05 TODO:
 * Provide working CloudFormation + masterless puppet example after example 5-9
+  * Use example 15a for this. However, I found you cannot use CloudFormation UserData to pass both roles and a shell script. It is one or the other. Given that it will be difficult to install the puppet agent and all the needed standard and custom Puppet modules via a shell script. Try to use UserData to set server role and then use packer to build a custom AMI with puppet agent and puppet modules baked in. Possibly install an /etc/rc.local script (sudo systemctl enable rc-local.service) to run 'puppet apply' after server boots the first time.
+  * Troubleshoot why mezzanine cannot connect to RDS database instance.
 * Provide working CloudFormation templates for chapter 5.
 
 ## Misc

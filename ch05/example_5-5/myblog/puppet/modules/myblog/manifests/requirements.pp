@@ -1,5 +1,5 @@
 class myblog::requirements {
-  $packages = ["python-dev", "python-pip", "libjpeg8", "libjpeg8-dev", "libtiff5-dev", "zlib1g-dev", "libfreetype6-dev", "python-imaging"] 
+  $packages = ["python-dev", "python-pip", "libjpeg8", "libjpeg8-dev", "libtiff5-dev", "zlib1g-dev", "libfreetype6-dev", "python-imaging", "python-mysqldb"] 
   package { $packages:
     ensure => installed
   }

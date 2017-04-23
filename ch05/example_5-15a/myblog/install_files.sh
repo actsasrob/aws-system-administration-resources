@@ -12,6 +12,5 @@ echo "Installing custom modules/manifests..."
 sudo mkdir -p $TARGET_DIR/modules/myblog/{manifests,modules,templates}
 sudo cp -f puppet/manifests/*.pp $TARGET_DIR/manifests
 sudo cp -f puppet/modules/myblog/manifests/*.pp $TARGET_DIR/modules/myblog/manifests
-sudo cp -f puppet/modules/myblog/templates/*.erb $TARGET_DIR/modules/myblog/templates
 
 echo "Puppet apply command: sudo puppet apply ${TARGET_DIR}/manifests/site.pp"
