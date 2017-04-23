@@ -10,15 +10,15 @@ NEVERCACHE_KEY = "nqd+3=pl7evznech#q8yb5nm$kd)zpv!o1(xs(+kyqy=(@%21w"
 DATABASES = {
     "default": {
         # Ends with "postgresql_psycopg2", "mysql", "sqlite3" or "oracle".
-        "ENGINE": "django.db.backends.mysql",
+        "ENGINE": "django.db.backends.sqlite3",
         # DB name or path to database file if using sqlite3.
-        "NAME": "mydb",
+        "NAME": "dev.db",
         # Not used with sqlite3.
-        "USER": "<%= @db_user %>",
+        "USER": "",
         # Not used with sqlite3.
-        "PASSWORD": "<%= @db_password %>",
+        "PASSWORD": "",
         # Set to empty string for localhost. Not used with sqlite3.
-        "HOST": "<%= @db_endpoint %>",
+        "HOST": "",
         # Set to empty string for default. Not used with sqlite3.
         "PORT": "",
     }
@@ -29,7 +29,7 @@ DATABASES = {
 ###################
 
 # Domains for public site
-ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = [""]
 
 # These settings are used by the default fabfile.py provided.
 # Check fabfile.py for defaults.
