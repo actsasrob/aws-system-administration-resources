@@ -31,7 +31,7 @@ class myblog::create_project {
 
   file_line { 'local_settingspy_name':
     path  => "${myblog::app_path}/${myblog::app_name}/local_settings.py",
-    line => "       \"NAME\": \"mydb\",",
+    line => "       \"NAME\": \"myblog\",",
     match  => '^*"NAME":',
     require => Exec["init-mezzanine-project"],
     notify => Exec["init-mezzanine-db"]

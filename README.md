@@ -171,6 +171,8 @@ Contents of Puppet local_settings.py.erb template used to create contents of mez
 
 Alternative approach to populate external database connection properties to mezzanine project local_settings.py file using puppet "file_line" resource.
 
+The 'ALLOWED_HOSTS' property will now be set in local_settings.py instead of settings.py.
+
 **NOTE:** There is no example 5-14a counterpart in the book.
 
 ### example5-15a
