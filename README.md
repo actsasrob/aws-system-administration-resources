@@ -183,8 +183,18 @@ Working example of Puppet myblog module and CloudFormation template to create RD
 
 My initial plan for this example was to install the Puppet agent, standard Puppet modules, and custom myblog Puppet module at instance boot time. However the approach in the book is to pass the server role and RDS database connection parameters to the web-tier EC2 instance via EC2 UserData. I don't believe you can pass both role(s) and a shell script (to build out the server) via UserData. If UserData is used to pass role(s) then another mechanism is needed to install Puppet and needed Puppet modules.
 
-I will take the approach to use packer to build a custom AMI which will install the latest Puppet agent, install standard Puppet modules, and then use git to clone the myblog Puppet module, then move the myblog manifest files into place. A custom /etc/rc.local script will be installed to run the 'puppet agent' command after the server boots to converge the server.
+I will take the approach to use packer to build a custom AMI which will install the latest Puppet agent, install standard Puppet modules, and then use git to clone the myblog Puppet module, then move the myblog manifest files into place. A custom /etc/rc.local script will be installed to run the 'puppet apply' command at server boot time to converge the server.
 
+Steps to run this example:
+1. Change directory to ch05/example5_15a/myblog/packer directory
+2. Edit packer_image.json and set the "source_ami" line to point to a valid Ubuntu 16.10 AMI in the desired region. Save and exit.
+3. Execute the packer_build.sh script (the packer command must be in your path) to build a custom AMI with Puppet agent, PuppetForge module dependencies for myblog application, and myblog custom Puppet module baked in.
+4. Note the name of the new AMI image in the last line of the packer build.
+5. Change directory up one level
+6. Edit myblog.sh script and set the value of the "WebAMI" parameter key to point to the AMI ID returned in step 4. Set the value of the "KeyName" parameter key to point to a valid SSH key for your account.
+7. Execute the myblog.sh script. This will invoke the AWS CloudFormation CLI to build the application stack. Once the myblog.sh script returns wait a few minutes (for 'puppet apply' command to complete to converge the server) then go to the AWS CloudFormation console, find the entry for "example-5-15a-stack" and then select the "Outputs" tab. In a browser navigate to the web instance DNS name found in the "Value" column. You should see the mezzanine application splash page.
+_**NOTE: Costs will be incurred for creating AWS resources!!!**_
+8. Use the CloudFormation console to terminate the stack.
 
 ### ch05 TODO:
 * Provide working CloudFormation + masterless puppet example after example 5-9
