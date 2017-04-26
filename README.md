@@ -133,8 +133,10 @@ Provide working CloudFormation template and CLI script to create AWS EC2 instanc
 * myblog.sh - Bash script which invokes 'aws cloudformation' CLI to create EC2 instance using CloudFormation template. _**NOTE: Costs will be incurred for creating AWS resources!!!**_
 * _Before running the above script you must set up your AWS credentials in ~/.aws/credentials or via environment variables. Edit myblog.sh and change the KeyName parameter to use an appropriatekey name for your AWS account. Edit myblog.sh and select an AMI in the selected region running Ubuntu 16.10._
 * Consistent with the content in the book masterless puppet is not yet integrated to install the application.
+* Don't forget to use the AWS CloudFormation console to terminate the stack.
 
 **NOTE:** Remember to use "ubuntu" user to ssh into EC2 instance.
+
 
 ### example_5-10
 
@@ -186,11 +188,11 @@ My initial plan for this example was to install the Puppet agent, standard Puppe
 I will take the approach to use packer to build a custom AMI which will install the latest Puppet agent, install standard Puppet modules, and then use git to clone the myblog Puppet module, then move the myblog manifest files into place. A custom /etc/rc.local script will be installed to run the 'puppet apply' command at server boot time to converge the server.
 
 Steps to run this example:
-1. Change directory to ch05/example5_15a/myblog/packer directory
+1. Change directory to ch05/example5_15a/myblog/packer directory.
 2. Edit packer_image.json and set the "source_ami" line to point to a valid Ubuntu 16.10 AMI in the desired region. Save and exit.
 3. Execute the packer_build.sh script (the packer command must be in your path) to build a custom AMI with Puppet agent, PuppetForge module dependencies for myblog application, and myblog custom Puppet module baked in.
 4. Note the name of the new AMI image in the last line of the packer build.
-5. Change directory up one level
+5. Change directory up one level.
 6. Edit myblog.sh script and set the value of the "WebAMI" parameter key to point to the AMI ID returned in step 4. Set the value of the "KeyName" parameter key to point to a valid SSH key for your account.
 7. Execute the myblog.sh script. This will invoke the AWS CloudFormation CLI to build the application stack. Once the myblog.sh script returns wait a few minutes (for 'puppet apply' command to complete to converge the server) then go to the AWS CloudFormation console, find the entry for "example-5-15a-stack" and then select the "Outputs" tab. In a browser navigate to the web instance DNS name found in the "Value" column. You should see the mezzanine application splash page.
 _**NOTE: Costs will be incurred for creating AWS resources!!!**_
