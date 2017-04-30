@@ -96,7 +96,7 @@ wget https://apt.puppetlabs.com/puppetlabs-release-pc1-yakkety.deb
 
 4. Install standard puppet modules from PuppetForge and custom puppet modules:
 
-   Edit TARGET_PATH variable in install_files.sh script to point to desired puppet module path and then execute installfiles.sh.
+   Edit TARGET_PATH variable in install_files.sh script to point to desired puppet module path and then execute install_files.sh.
 
     ./install_files.sh
 
