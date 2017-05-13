@@ -1,0 +1,17 @@
+DATABASES = {
+  "default": {
+    "ENGINE": "django.db.backends.mysql",
+    "NAME": "mydb",
+    "USER": "<%= @db_user %>",
+    "PASSWORD": "<%= @db_password %>",
+    "HOST": "<%= @db_endpoint %>",
+    "PORT": "",
+  }
+}
+
+CACHES = {
+  "default": {
+    "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+      "LOCATION": "<%= @cache_endpoint %>:11211",
+   }
+}

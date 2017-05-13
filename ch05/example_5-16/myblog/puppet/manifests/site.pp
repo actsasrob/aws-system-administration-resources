@@ -1,0 +1,1 @@
+../../../../example_5-13/myblog/puppet/manifests/site.pp
