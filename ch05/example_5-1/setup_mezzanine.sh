@@ -17,8 +17,8 @@ sudo chown mezzanine /srv/myblog
 sudo -u mezzanine mezzanine-project myblog /srv/myblog
 cd /srv/myblog
 
-#sudo -u mezzanine python manage.py createdb
-#sudo -u mezzanine python manage.py runserver 0.0.0.0:8000
+sudo -u mezzanine python manage.py createdb --noinput
+sudo -u mezzanine python manage.py runserver 0.0.0.0:8000 &
 
 # Install/config Nginx
 sudo apt -y install nginx
@@ -27,6 +27,6 @@ sudo mv /etc/nginx/sites-enabled/default ~/default.orig
 sudo cp $MY_PATH/myblog.conf /etc/nginx/sites-enabled/myblog.conf
 sudo chmod 644 /etc/nginx/sites-enabled/myblog.conf
 
-#sudo systemctl enable nginx
-#sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
 
