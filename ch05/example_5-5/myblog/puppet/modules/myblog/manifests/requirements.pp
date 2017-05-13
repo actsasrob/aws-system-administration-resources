@@ -4,7 +4,7 @@ class myblog::requirements {
     ensure => installed
   }
 
-  $pip_packages = ["Mezzanine", "python-memcached"]
+  $pip_packages = ["Mezzanine"]
   package { $pip_packages:
     ensure => installed,
     provider => pip,
