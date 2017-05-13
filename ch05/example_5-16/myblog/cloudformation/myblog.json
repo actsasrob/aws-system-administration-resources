@@ -22,6 +22,34 @@
 		}
 	},
 	"Resources": {
+		"CacheCluster": {
+			"Type": "AWS::ElastiCache::CacheCluster",
+			"Properties": {
+				"CacheNodeType": "cache.m1.small",
+				"CacheSecurityGroupNames": [
+					"CacheSecurityGroup"
+				],
+				"Engine": "memcached",
+				"NumCacheNodes": "1"
+			}
+		},
+		"CacheSecurityGroup": {
+			"Type": "AWS::ElastiCache::SecurityGroup",
+			"Properties": {
+				"Description": "Allow access from Web instances"
+			}
+		},
+		"CacheSecurityGroupIngress": {
+			"Type": "AWS::ElastiCache::SecurityGroupIngress",
+			"Properties": {
+				"CacheSecurityGroupName": {
+					"Ref": "CacheSecurityGroup"
+				},
+				"EC2SecurityGroupName": {
+					"Ref": "WebSecurityGroup"
+				}
+			}
+		},
 		"BlogDB": {
 			"Type": "AWS::RDS::DBInstance",
 			"Properties": {
@@ -98,7 +126,6 @@
 								},
 								"\" }"
 							]
-
 						]
 					}
 				}
