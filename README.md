@@ -42,6 +42,28 @@ To help map content in this git repository to the book I'll name the directories
 
 **NOTE:** The mezzanine project now resides in /srv/myblog/mblog. The settings.py and and local_settings.py files reside in /srv/myblog/myblog instead of /srv/myblog as indicated in the book. This was done to workaround permission problems creating the /srv/myblog directory as the 'mezzanine' user. Also the /usr/local/bin/mezzaine-project script fails if the project directory already exists. The /srv/blog directory is created and ownership set to the 'mezzanine' user. Later the mezzanine project is created in /srv/myblog/myblog.
 
+### example_5-1
+
+Add runnable example, using vagrant, to create mezzanine application fronted by Nginx.
+
+The setup_mezzanine.sh script contains the steps in install and configure a mezzanine Django application. Vagrant is used to launch an Ubuntu 16.10 VM using VirtualBox. The vagrant VM clones this GIT project and then invokes the ch05/example_5-1/setup_mezzanine.sh script to install/configure and run the Django application.
+
+To run the example:
+1. Install vagrant
+2. Install the Ubuntu 16.10 vagrant image:
+```vagrant box add "ubuntu/xenial64"
+3. cd to the top-level directory for this git project. Same directory at the 'Vagrantfile' file.
+4. Launch the example_5_1 VM using vagrant:
+```vagrant up example_5_1
+
+You can ssh to the VM using:
+```vagrant ssh example_5_1
+
+**NOTE:** Type 'exit' followed by the enter key to exit the ssh session.
+
+To destroy the VM use:
+```vagrant destroy example_5_1
+
 ### example_5-3
 
 Add puppet/manifests/site.pp file to drive installation of myblog class. This manifest file should be used with AWS EC2 instances where the server role has been set using "user data".

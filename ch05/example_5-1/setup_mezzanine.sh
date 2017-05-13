@@ -29,6 +29,8 @@ sudo mv /etc/nginx/sites-enabled/default ~/default.orig
 sudo cp $MY_PATH/myblog.conf /etc/nginx/sites-enabled/myblog.conf
 sudo chmod 644 /etc/nginx/sites-enabled/myblog.conf
 
+sleep 5 
+
 sudo systemctl enable nginx
 sudo systemctl start nginx
 

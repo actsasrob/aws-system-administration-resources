@@ -27,6 +27,21 @@ $ubuntu_setupscript = <<END
   echo 'done.'
 END
 
+$ubuntu_setupscript_example_5_1 = <<END
+  echo 'setting up Ubuntu 16.10 yakkety yak...'
+  #sudo apt-get update
+
+  sudo apt-get -y install tree
+
+  echo "Checking out aws-system-administration-resources git project..."
+  git clone https://github.com/actsasrob/aws-system-administration-resources.git
+
+  cd aws-system-administration-resources/ch05/example_5-1
+  ./setup_mezzanine.sh
+ 
+  echo 'done.'
+END
+
 $ubuntu_setupscript_example_5_8 = <<END
   echo 'setting up Ubuntu 16.10 yakkety yak...'
   echo 'installing Puppet 4.x...'
@@ -102,6 +117,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     client.vm.hostname = "client.example.com"
     client.vm.network :private_network, ip: "192.168.250.10"
     client.vm.provision "shell", inline: $ubuntu_setupscript
+  end
+
+  config.vm.define "example_5_1", primary: true do |client|
+    client.vm.hostname = "client.example.com"
+    client.vm.network :private_network, ip: "192.168.250.11"
+    client.vm.provision "shell", inline: $ubuntu_setupscript_example_5_1
   end
 
   config.vm.define "example_5_8", primary: true do |client|
