@@ -124,6 +124,13 @@
 								{
 									"Ref": "DBPassword"
 								},
+								" \"cache_endpoint\": \"",
+								{
+									"Fn::GetAtt": [
+										"CacheCluster",
+										"ConfigurationEndpoint.Address"
+									]
+								},
 								"\" }"
 							]
 						]
