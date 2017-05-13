@@ -198,6 +198,28 @@ Steps to run this example:
 _**NOTE: Costs will be incurred for creating AWS resources!!!**_
 8. Use the CloudFormation console to terminate the stack.
 
+### example_5-16
+
+Consistent with the content in the book this example add cache cluster support for the Mezzanine application.
+
+The puppet local_settings.py.erb template is updated to add the "CACHES" block to make the Mezzanine application aware of the cache cluster endpoint. The template expects a variable named "cache_endpoint" will exist and contain a reference to an existing cache cluster endpoint.
+
+The puppet myblog requirements.pp manifest is updated to ensure the python-memcached package is installed via python pip.
+
+The puppet site.pp manifest is updated to retrieve the cache cluster endpoint via CloudFormation UserData. The endpoint is then passed as a parameter, named cache_endpoint, to the myblog class declaration to initialize the puppet myblog class. When the myblog class is instantiated the puppet myblog local_settings.py.erb template will be invoked to create the Mezzanine local_settings.py file containing a reference to the cache cluster endpoint.
+
+Finally, the CloudFormation template is updated to add a Memcached resource named "CacheCluster" which will cause an AWS Memcached cluster to be created when the CloudFormation template is invoked. In example_5-17 the CloudFormation template UserData section will be updated to pass a reference to the Memcached cluster endpoint, via JSON key cache_endpoint, to the web server EC2 instance at launch time.
+
+NOTE: This example is not runnable.
+
+### example_5_17
+
+The CloudFormation template UserData section is updated to pass a reference to the AWS Elaticache Memcached cluster endpoint, via JSON key cache_endpoint, to the web server EC2 instance at launch time.
+
+NOTE: This example is not runnable.
+
+
+
 ### ch05 TODO:
 * Provide working CloudFormation + masterless puppet example after example 5-9
   * Use example 15a for this. However, I found you cannot use CloudFormation UserData to pass both roles and a shell script. It is one or the other. Given that it will be difficult to install the puppet agent and all the needed standard and custom Puppet modules via a shell script. Try to use UserData to set server role and then use packer to build a custom AMI with puppet agent and puppet modules baked in. Possibly install an /etc/rc.local script (sudo systemctl enable rc-local.service) to run 'puppet apply' after server boots the first time.
