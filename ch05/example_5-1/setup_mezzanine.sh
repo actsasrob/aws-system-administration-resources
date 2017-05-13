@@ -17,6 +17,8 @@ sudo chown mezzanine /srv/myblog
 sudo -u mezzanine mezzanine-project myblog /srv/myblog
 cd /srv/myblog
 
+echo "ALLOWED_HOSTS = '*'" | sudo tee -a myblog/local_settings.py
+
 sudo -u mezzanine python manage.py createdb --noinput
 sudo -u mezzanine python manage.py runserver 0.0.0.0:8000 &
 
