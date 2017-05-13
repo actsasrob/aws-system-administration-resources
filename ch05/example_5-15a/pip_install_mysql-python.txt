@@ -1,2 +1,0 @@
-Error: Execution of '/usr/bin/pip install -q mysql-python' returned 1: Command "python setup.py egg_info" failed with error code 1 in /tmp/pip-build-d47ToF/mysql-python/
-Error: /Stage[main]/Myblog::Requirements/Package[mysql-python]/ensure: change from absent to present failed: Execution of '/usr/bin/pip install -q mysql-python' returned 1: Command "python setup.py egg_info" failed with error code 1 in /tmp/pip-build-d47ToF/mysql-python/

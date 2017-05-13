@@ -7,13 +7,10 @@ if [ "$?" -ne 0 ]; then
 fi
 
 # ubuntu/images-testing/hvm-ssd/ubuntu-yakkety-daily-amd64-server-20170303.1 - ami-0f6fb419
-output=$(aws cloudformation create-stack --stack-name example-5-15a-stack --template-body \
+output=$(aws cloudformation create-stack --stack-name example-5-9-stack --template-body \
 file://cloudformation/myblog.json \
 --region us-east-1 --capabilities CAPABILITY_IAM \
---parameters ParameterKey=WebAMI,ParameterValue=ami-0f6fb419 \
-ParameterKey=CeleryAMI,ParameterValue=ami-0f6fb419 \
-ParameterKey=DBUser,ParameterValue="myblogdbuser" \
-ParameterKey=DBPassword,ParameterValue="password\$1234" \
+--parameters ParameterKey=AMI,ParameterValue=ami-0f6fb419 \
 ParameterKey=KeyName,ParameterValue=RobertHughes)
 
 if [ "$?" -eq 0 ]; then
