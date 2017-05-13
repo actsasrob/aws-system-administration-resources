@@ -46,23 +46,27 @@ To help map content in this git repository to the book I'll name the directories
 
 Add runnable example, using vagrant, to create mezzanine application fronted by Nginx.
 
-The setup_mezzanine.sh script contains the steps in install and configure a mezzanine Django application. Vagrant is used to launch an Ubuntu 16.10 VM using VirtualBox. The vagrant VM clones this GIT project and then invokes the ch05/example_5-1/setup_mezzanine.sh script to install/configure and run the Django application.
+The setup_mezzanine.sh script contains the steps to install and configure a mezzanine Django application. Vagrant is used to launch an Ubuntu 16.10 VM using VirtualBox. The vagrant VM clones this GIT project and then invokes the ch05/example_5-1/setup_mezzanine.sh script to install/configure and run the Django application.
 
 To run the example:
-1. Install vagrant
+1. Install vagrant/VirtualBox
 2. Install the Ubuntu 16.10 vagrant image:
-```vagrant box add "ubuntu/xenial64"
+```
+vagrant box add "ubuntu/xenial64"
 3. cd to the top-level directory for this git project. Same directory at the 'Vagrantfile' file.
 4. Launch the example_5_1 VM using vagrant:
-```vagrant up example_5_1
+```
+vagrant up example_5_1
 
 You can ssh to the VM using:
-```vagrant ssh example_5_1
+```
+vagrant ssh example_5_1
 
 **NOTE:** Type 'exit' followed by the enter key to exit the ssh session.
 
 To destroy the VM use:
-```vagrant destroy example_5_1
+```
+vagrant destroy example_5_1
 
 ### example_5-3
 
