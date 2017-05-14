@@ -96,7 +96,7 @@
 		"CeleryQueue": {
 			"Type": "AWS::SQS::Queue"
 		},
-		"BlogRole": {
+		"MyBlogRole": {
 			"Type": "AWS::IAM::Role",
 			"Properties": {
 				"AssumeRolePolicyDocument": {
@@ -118,7 +118,7 @@
 				"Path": "/",
 				"Policies": [
 					{
-						"PolicyName": "MyBlogRole",
+						"PolicyName": "MyBlogPolicy",
 						"PolicyDocument": {
 							"Version": "2012-10-17",
 							"Statement": [
