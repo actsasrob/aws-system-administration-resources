@@ -241,14 +241,35 @@ The puppet site.pp manifest is updated to retrieve the cache cluster endpoint vi
 
 Finally, the CloudFormation template is updated to add a Memcached resource named "CacheCluster" which will cause an AWS Memcached cluster to be created when the CloudFormation template is invoked. In example_5-17 the CloudFormation template UserData section will be updated to pass a reference to the Memcached cluster endpoint, via JSON key cache_endpoint, to the web server EC2 instance at launch time.
 
-NOTE: This example is not runnable.
+**NOTE:** This example is not runnable.
 
-### example_5_17
+### example_5-17
 
 The CloudFormation template UserData section is updated to pass a reference to the AWS Elaticache Memcached cluster endpoint, via JSON key cache_endpoint, to the web server EC2 instance at launch time.
 
-NOTE: This example is not runnable.
+**NOTE:** This example is not runnable.
 
+### example_5-18
+
+Add /srv/myblog/tasks.py containing celery task to perform spam check for each new blog post.
+
+**NOTE:** This example is not runnable.
+
+### example_5-19
+
+Update the /srv/myblog/myblog/local_settings.py file to initialize the django-celery package.
+
+**NOTE:** This example is not runnable.
+
+### exmaple_5-20
+
+Various puppet module updates to install and start django-celery.
+
+myblog/puppet/manifests/site.pp is updated to recognize a server "celery" role, passed via CloudFormation UserData, and the $role_class variable is set appropriately so that the myblog::celery class will be declared when the server role is set to "celery".
+
+The myblog::celery class manifest is created in myblog/puppet/modules/myblog/manifests/celery.ppp.
+
+Configuration logic is added to the myblog/puppet/modules/myblog/templates/local_settings.py.erb to configure the django celery module.
 
 
 ### ch05 TODO:
