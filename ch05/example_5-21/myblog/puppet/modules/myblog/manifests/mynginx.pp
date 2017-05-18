@@ -1,0 +1,1 @@
+../../../../../../example_5-7/myblog/puppet/modules/myblog/manifests/mynginx.pp

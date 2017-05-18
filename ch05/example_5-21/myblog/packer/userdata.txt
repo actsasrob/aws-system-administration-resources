@@ -1,0 +1,5 @@
+ {
+'role' : "
+  $db_endpoint = $userdata['db_endpoint']
+  $db_user = $userdata['db_user']
+  $db_password = $userdata['db_password']

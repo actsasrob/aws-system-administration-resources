@@ -1,0 +1,324 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Mezzanine-powered blog, served with Nginx.",
+	"Parameters": {
+		"KeyName": {
+			"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+			"Type": "String"
+		},
+		"WebAMI": {
+			"Description": "AMI ID",
+			"Type": "String"
+		},
+		"CeleryAMI": {
+			"Type": "String"
+		},
+		"DBUser": {
+			"Type": "String"
+		},
+		"DBPassword": {
+			"Type": "String",
+			"NoEcho": "TRUE"
+		}
+	},
+	"Resources": {
+		"CacheCluster": {
+			"Type": "AWS::ElastiCache::CacheCluster",
+			"Properties": {
+				"CacheNodeType": "cache.m1.small",
+				"CacheSecurityGroupNames": [
+					"CacheSecurityGroup"
+				],
+				"Engine": "memcached",
+				"NumCacheNodes": "1"
+			}
+		},
+		"CacheSecurityGroup": {
+			"Type": "AWS::ElastiCache::SecurityGroup",
+			"Properties": {
+				"Description": "Allow access from Web instances"
+			}
+		},
+		"CacheSecurityGroupIngress": {
+			"Type": "AWS::ElastiCache::SecurityGroupIngress",
+			"Properties": {
+				"CacheSecurityGroupName": {
+					"Ref": "CacheSecurityGroup"
+				},
+				"EC2SecurityGroupName": {
+					"Ref": "WebSecurityGroup"
+				}
+			}
+		},
+		"BlogDB": {
+			"Type": "AWS::RDS::DBInstance",
+			"Properties": {
+				"DBSecurityGroups": [
+					{
+						"Ref": "DBSecurityGroup"
+					},
+					{
+						"Ref": "CelerySecurityGroup"
+					}
+				],
+				"DBName": "myblog",
+				"AllocatedStorage": 5,
+				"DBInstanceClass": "db.t2.micro",
+				"Engine": "MySQL",
+				"EngineVersion": "5.6.27",
+				"MasterUsername": {
+					"Ref": "DBUser"
+				},
+				"MasterUserPassword": {
+					"Ref": "DBPassword"
+				}
+			},
+			"DeletionPolicy": "Snapshot"
+		},
+		"DBSecurityGroup": {
+			"Type": "AWS::RDS::DBSecurityGroup",
+			"Properties": {
+				"GroupDescription": "Allow inbound MySQL access from web instances",
+				"DBSecurityGroupIngress": [
+					{
+						"EC2SecurityGroupName": {
+							"Ref": "WebSecurityGroup"
+						}
+					},
+					{
+						"EC2SecurityGroupName": {
+							"Ref": "CelerySecurityGroup"
+						}
+					}
+				]
+			}
+		},
+		"CeleryQueue": {
+			"Type": "AWS::SQS::Queue"
+		},
+		"MyBlogRole": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Principal": {
+								"Service": [
+									"ec2.amazonaws.com"
+								]
+							},
+							"Action": [
+								"sts:AssumeRole"
+							]
+						}
+					]
+				},
+				"Path": "/",
+				"Policies": [
+					{
+						"PolicyName": "MyBlogPolicy",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Effect": "Allow",
+									"Action": "sqs:*",
+									"Resource": {
+										"Ref": "CeleryQueue"
+									}
+								}
+							]
+						}
+					}
+				]
+			}
+		},
+		"CeleryInstance": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"SecurityGroups": [
+					{
+						"Ref": "CelerySecurityGroup"
+					}
+				],
+				"KeyName": "my-ssh-keypair",
+				"ImageId": {
+					"Ref": "CeleryAMI"
+				},
+				"IamInstanceProfile": {
+					"Ref": "MyBlogInstanceProfile"
+				},
+				"UserData": {
+					"Fn::Base64": {
+						"Fn::Join": [
+							"",
+							[
+								"{\"role\": \"celery\",",
+								" \"db_endpoint\": \"",
+								{
+									"Fn::GetAtt": [
+										"BlogDB",
+										"Endpoint.Address"
+									]
+								},
+								"\",",
+								" \"db_user\": \"",
+								{
+									"Ref": "DBUser"
+								},
+								"\",",
+								" \"db_password\": \"",
+								{
+									"Ref": "DBPassword"
+								},
+								"\",",
+								" \"cache_endpoint\": \"",
+								{
+									"Fn::GetAtt": [
+										"CacheCluster",
+										"ConfigurationEndpoint.Address"
+									]
+								},
+								"\"}"
+							]
+						]
+					}
+				}
+			}
+		},
+		"CelerySecurityGroup": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"GroupDescription": "Allow SSH from anywhere",
+				"SecurityGroupIngress": [
+					{
+						"IpProtocol": "tcp",
+						"FromPort": "22",
+						"ToPort": "22",
+						"CidrIp": "0.0.0.0/0"
+					}
+				]
+			}
+		},
+		"CelerySecurityGroupIngress": {
+			"Type": "AWS::ElastiCache::SecurityGroupIngress",
+			"Properties": {
+				"CacheSecurityGroupName": {
+					"Ref": "CacheSecurityGroup"
+				},
+				"EC2SecurityGroupName": {
+					"Ref": "CelerySecurityGroup"
+				}
+			}
+		},
+		"MyBlogInstanceProfile": {
+			"Type": "AWS::IAM::InstanceProfile",
+			"Properties": {
+				"Path": "/",
+				"Roles": [
+					{
+						"Ref": "MyBlogRole"
+					}
+				]
+			}
+		},
+		"WebInstance": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"InstanceType": "t2.micro",
+				"SecurityGroups": [
+					{
+						"Ref": "WebSecurityGroup"
+					}
+				],
+				"KeyName": {
+					"Ref": "KeyName"
+				},
+				"ImageId": {
+					"Ref": "WebAMI"
+				},
+				"IamInstanceProfile": {
+					"Ref": "MyBlogInstanceProfile"
+				},
+				"UserData": {
+					"Fn::Base64": {
+						"Fn::Join": [
+							"",
+							[
+								"{\n",
+								"\"role\" : \"web\",",
+								" \"db_endpoint\": \"",
+								{
+									"Fn::GetAtt": [
+										"BlogDB",
+										"Endpoint.Address"
+									]
+								},
+								"\",",
+								" \"db_user\": \"",
+								{
+									"Ref": "DBUser"
+								},
+								"\",",
+								" \"db_password\": \"",
+								{
+									"Ref": "DBPassword"
+								},
+								" \"cache_endpoint\": \"",
+								{
+									"Fn::GetAtt": [
+										"CacheCluster",
+										"ConfigurationEndpoint.Address"
+									]
+								},
+								"\" }"
+							]
+						]
+					}
+				}
+			}
+		},
+		"WebSecurityGroup": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"GroupDescription": "Allow SSH and HTTP from anywhere",
+				"SecurityGroupIngress": [
+					{
+						"IpProtocol": "tcp",
+						"FromPort": "22",
+						"ToPort": "22",
+						"CidrIp": "0.0.0.0/0"
+					},
+					{
+						"IpProtocol": "tcp",
+						"FromPort": "80",
+						"ToPort": "80",
+						"CidrIp": "0.0.0.0/0"
+					}
+				]
+			}
+		}
+	},
+	"Outputs": {
+		"WebInstanceDNSName": {
+			"Value": {
+				"Fn::GetAtt": [
+					"WebInstance",
+					"PublicDnsName"
+				]
+			},
+			"Description": "DNS Name of Web managed instance"
+		},
+		"CeleryInstanceDNSName": {
+			"Value": {
+				"Fn::GetAtt": [
+					"CeleryInstance",
+					"PublicDnsName"
+				]
+			},
+			"Description": "DNS Name of Celery managed instance"
+		}
+	}
+}

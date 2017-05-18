@@ -1,0 +1,28 @@
+{
+"variables": {
+  "aws_access_key": "",
+  "aws_secret_key": ""
+},
+"provisioners": [
+  {
+    "type": "shell",
+    "script": "install_puppet.sh"
+  },
+  { "type": "puppet-masterless",
+    "manifest_file": "puppet/manifests/site.pp",
+    "module_paths": ["puppet/modules"]
+  }
+],
+"builders": [{
+  "type": "amazon-ebs",
+  "access_key": "",
+  "secret_key": "",
+  "region": "us-east-1",
+  "source_ami": "ami-0f6fb419",
+  "instance_type": "t2.small",
+  "ssh_username": "ubuntu",
+  "associate_public_ip_address": true,
+  "ami_name": "myblog-celery-",
+  "user_data": "{\"role\": \"celery\"}"
+  }]
+}

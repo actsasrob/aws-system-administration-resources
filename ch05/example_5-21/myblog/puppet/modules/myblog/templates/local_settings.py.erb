@@ -1,0 +1,48 @@
+# Make these unique, and don't share it with anybody.
+SECRET_KEY = "np9co*)(@^_)((0s=ml%r5&@hqhu9b(&6^-%ad%&yyf%$=1ys2"
+NEVERCACHE_KEY = "nqd+3=pl7evznech#q8yb5nm$kd)zpv!o1(xs(+kyqy=(@%21w"
+
+DATABASES = {
+  "default": {
+    "ENGINE": "django.db.backends.mysql",
+    "NAME": "mydb",
+    "USER": "<%= @db_user %>",
+    "PASSWORD": "<%= @db_password %>",
+    "HOST": "<%= @db_endpoint %>",
+    "PORT": "",
+  }
+}
+
+CACHES = {
+  "default": {
+    "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+      "LOCATION": "<%= @cache_endpoint %>:11211",
+   }
+}
+
+BROKER_URL = 'sqs://'
+BROKER_TRANSPORT_OPTIONS = {'region': 'us-east-1'}
+CELERY_IMPORTS = ('tasks')
+
+INSTALLED_APPS = (
+   "django.contrib.admin",
+   "django.contrib.auth",
+   "django.contrib.contenttypes",
+   "django.contrib.redirects",
+   "django.contrib.sessions",
+   "django.contrib.sites",
+   "django.contrib.sitemaps",
+   "django.contrib.staticfiles",
+   "mezzanine.boot",
+   "mezzanine.conf",
+   "mezzanine.core",
+   "mezzanine.generic",
+   "mezzanine.blog",
+   "mezzanine.forms",
+   "mezzanine.pages",
+   "mezzanine.galleries",
+   "mezzanine.twitter",
+#"mezzanine.accounts",
+#"mezzanine.mobile",
+   "djcelery",
+)
