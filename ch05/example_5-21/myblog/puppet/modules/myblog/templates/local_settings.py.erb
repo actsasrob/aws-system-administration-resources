@@ -5,7 +5,7 @@ NEVERCACHE_KEY = "nqd+3=pl7evznech#q8yb5nm$kd)zpv!o1(xs(+kyqy=(@%21w"
 DATABASES = {
   "default": {
     "ENGINE": "django.db.backends.mysql",
-    "NAME": "mydb",
+    "NAME": "myblog",
     "USER": "<%= @db_user %>",
     "PASSWORD": "<%= @db_password %>",
     "HOST": "<%= @db_endpoint %>",
@@ -46,3 +46,38 @@ INSTALLED_APPS = (
 #"mezzanine.mobile",
    "djcelery",
 )
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'applogfile': {
+        'level':'DEBUG',
+        'class':'logging.handlers.RotatingFileHandler',
+        'filename': os.path.join(PROJECT_ROOT, 'APPNAME.log'),
+        'maxBytes': 1024*1024*15, # 15MB
+        'backupCount': 10,
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'APPNAME': {
+            'handlers': ['applogfile',],
+            'level': 'DEBUG',
+        }
+    }
+}

@@ -17,7 +17,7 @@
 "source_ami": "ami-0f6fb419",
 "instance_type": "t2.small",
 "ssh_username": "ubuntu",
-"ami_name": "my-packer-example-",
+"ami_name": "myblog-web-",
 "user_data": "{\"role\": \"web\" }",
 "associate_public_ip_address": true
 }]

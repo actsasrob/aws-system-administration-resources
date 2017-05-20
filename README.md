@@ -271,6 +271,18 @@ The myblog::celery class manifest is created in myblog/puppet/modules/myblog/man
 
 Configuration logic is added to the myblog/puppet/modules/myblog/templates/local_settings.py.erb to configure the django celery module.
 
+Update CloudFormation template to create IAM role/policy allowing web/celery EC2 instances to interact with SQS queue, update Resources section to create an EC2 instance running Django celery task, allow web,celery EC2 instances access to Cache cluster, and update RDS DB ingress rules to permit access by web/celery EC2 instances.
+
+### example_5-21
+
+Example 5-21 is a work in progress.
+
+**NOTE:** How to create admin account for mezzanine:
+```
+cd /srv/myblog
+python manage.py createsuperuser
+```
+
 
 ### ch05 TODO:
 * Provide working CloudFormation + masterless puppet example after example 5-9

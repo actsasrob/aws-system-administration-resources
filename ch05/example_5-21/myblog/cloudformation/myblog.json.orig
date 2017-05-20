@@ -13,11 +13,6 @@
 		"CeleryAMI": {
 			"Type": "String"
 		},
-                "InstanceType" : {
-                   "Description" : "Type of EC2 instance to launch",
-                   "Type" : "String",
-                   "Default" : "t2.micro"
-                },
 		"DBUser": {
 			"Type": "String"
 		},
@@ -61,6 +56,9 @@
 				"DBSecurityGroups": [
 					{
 						"Ref": "DBSecurityGroup"
+					},
+					{
+						"Ref": "CelerySecurityGroup"
 					}
 				],
 				"DBName": "myblog",
@@ -96,7 +94,10 @@
 			}
 		},
 		"CeleryQueue": {
-			"Type": "AWS::SQS::Queue"
+			"Type": "AWS::SQS::Queue",
+        "Properties": {
+            "QueueName": "CeleryQueue"
+        }
 		},
 		"MyBlogRole": {
 			"Type": "AWS::IAM::Role",
@@ -128,7 +129,7 @@
 									"Effect": "Allow",
 									"Action": "sqs:*",
 									"Resource": {
-										"Fn::GetAtt" : ["CeleryQueue", "Arn"] 
+										"Ref": "arn:aws:sqs:us-east-1:524683554318:CeleryQueue" 
 									}
 								}
 							]
@@ -140,15 +141,12 @@
 		"CeleryInstance": {
 			"Type": "AWS::EC2::Instance",
 			"Properties": {
-                                "InstanceType": { "Ref": "InstanceType" },
 				"SecurityGroups": [
 					{
 						"Ref": "CelerySecurityGroup"
 					}
 				],
-				"KeyName": {
-					"Ref": "KeyName"
-				},
+				"KeyName": "my-ssh-keypair",
 				"ImageId": {
 					"Ref": "CeleryAMI"
 				},
@@ -232,7 +230,7 @@
 		"WebInstance": {
 			"Type": "AWS::EC2::Instance",
 			"Properties": {
-				"InstanceType": { "Ref": "InstanceType" },
+				"InstanceType": "t2.micro",
 				"SecurityGroups": [
 					{
 						"Ref": "WebSecurityGroup"
@@ -271,7 +269,6 @@
 								{
 									"Ref": "DBPassword"
 								},
-								"\",",
 								" \"cache_endpoint\": \"",
 								{
 									"Fn::GetAtt": [
@@ -325,10 +322,6 @@
 				]
 			},
 			"Description": "DNS Name of Celery managed instance"
-		},
-    "CeleryQueueURL" : {
-      "Description" : "URL of the  queue",
-      "Value" : { "Ref" : "CeleryQueue" }
-    }
+		}
 	}
 }

@@ -10,9 +10,9 @@ echo "Installing required puppet modules..."
 
 echo "Installing custom modules/manifests..."
 sudo mkdir -p $TARGET_DIR/modules
-sudo cp -r puppet/modules/* $TARGET_DIR/modules
+sudo cp -r -f --dereference puppet/modules/* $TARGET_DIR/modules
 #sudo mkdir -p $TARGET_DIR/modules/myblog/{manifests,modules,templates,files}
-sudo cp -f puppet/manifests/*.pp $TARGET_DIR/manifests
+sudo cp -f --dereference puppet/manifests/*.pp $TARGET_DIR/manifests
 #sudo cp -f puppet/modules/myblog/manifests/*.pp $TARGET_DIR/modules/myblog/manifests
 
 echo "Puppet apply command: sudo puppet apply ${TARGET_DIR}/manifests/site.pp"
