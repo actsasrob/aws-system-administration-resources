@@ -6,6 +6,7 @@ node default {
   $db_endpoint = $userdata['db_endpoint']
   $db_user = $userdata['db_user']
   $db_password = $userdata['db_password']
+  $queue_endpoint = $userdata['queue_endpoint']
   $cache_endpoint = $userdata['cache_endpoint']
 
   case $role {
@@ -21,7 +22,7 @@ node default {
     db_password => $db_password,
   }
 
-  # Role-specific class, e.g. myblog::web
+  # Role-specific class: myblog::web, myblog::celery, etc.
   class { $role_class:
   }
 }
