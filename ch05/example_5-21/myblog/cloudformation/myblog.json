@@ -13,11 +13,11 @@
 		"CeleryAMI": {
 			"Type": "String"
 		},
-                "InstanceType" : {
-                   "Description" : "Type of EC2 instance to launch",
-                   "Type" : "String",
-                   "Default" : "t2.micro"
-                },
+		"InstanceType": {
+			"Description": "Type of EC2 instance to launch",
+			"Type": "String",
+			"Default": "t2.micro"
+		},
 		"DBUser": {
 			"Type": "String"
 		},
@@ -32,7 +32,9 @@
 			"Properties": {
 				"CacheNodeType": "cache.m1.small",
 				"CacheSecurityGroupNames": [
-					{ "Ref": "CacheSecurityGroup" }
+					{
+						"Ref": "CacheSecurityGroup"
+					}
 				],
 				"Engine": "memcached",
 				"NumCacheNodes": "1"
@@ -128,7 +130,10 @@
 									"Effect": "Allow",
 									"Action": "sqs:*",
 									"Resource": {
-										"Fn::GetAtt" : ["CeleryQueue", "Arn"] 
+										"Fn::GetAtt": [
+											"CeleryQueue",
+											"Arn"
+										]
 									}
 								}
 							]
@@ -140,7 +145,9 @@
 		"CeleryInstance": {
 			"Type": "AWS::EC2::Instance",
 			"Properties": {
-                                "InstanceType": { "Ref": "InstanceType" },
+				"InstanceType": {
+					"Ref": "InstanceType"
+				},
 				"SecurityGroups": [
 					{
 						"Ref": "CelerySecurityGroup"
@@ -177,6 +184,11 @@
 								" \"db_password\": \"",
 								{
 									"Ref": "DBPassword"
+								},
+								"\",",
+								" \"queue_endpoint\": \"",
+								{
+									"Ref": "CeleryQueue"
 								},
 								"\",",
 								" \"cache_endpoint\": \"",
@@ -232,7 +244,9 @@
 		"WebInstance": {
 			"Type": "AWS::EC2::Instance",
 			"Properties": {
-				"InstanceType": { "Ref": "InstanceType" },
+				"InstanceType": {
+					"Ref": "InstanceType"
+				},
 				"SecurityGroups": [
 					{
 						"Ref": "WebSecurityGroup"
@@ -270,6 +284,11 @@
 								" \"db_password\": \"",
 								{
 									"Ref": "DBPassword"
+								},
+								"\",",
+								" \"queue_endpoint\": \"",
+								{
+									"Ref": "CeleryQueue"
 								},
 								"\",",
 								" \"cache_endpoint\": \"",
@@ -326,9 +345,11 @@
 			},
 			"Description": "DNS Name of Celery managed instance"
 		},
-    "CeleryQueueURL" : {
-      "Description" : "URL of the  queue",
-      "Value" : { "Ref" : "CeleryQueue" }
-    }
+		"CeleryQueueURL": {
+			"Description": "URL of the  queue",
+			"Value": {
+				"Ref": "CeleryQueue"
+			}
+		}
 	}
 }
