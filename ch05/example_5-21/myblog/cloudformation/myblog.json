@@ -98,7 +98,10 @@
 			}
 		},
 		"CeleryQueue": {
-			"Type": "AWS::SQS::Queue"
+			"Type": "AWS::SQS::Queue",
+			"Properties": {
+				"QueueName": "celeryqueue"
+			}
 		},
 		"MyBlogRole": {
 			"Type": "AWS::IAM::Role",
@@ -286,9 +289,12 @@
 									"Ref": "DBPassword"
 								},
 								"\",",
-								" \"queue_endpoint\": \"",
+								" \"queue_name\": \"",
 								{
-									"Ref": "CeleryQueue"
+									"Fn::GetAtt": [
+										"CeleryQueue",
+										"QueueName"
+									]
 								},
 								"\",",
 								" \"cache_endpoint\": \"",
@@ -346,9 +352,18 @@
 			"Description": "DNS Name of Celery managed instance"
 		},
 		"CeleryQueueURL": {
-			"Description": "URL of the  queue",
+			"Description": "URL of the  Celery queue",
 			"Value": {
 				"Ref": "CeleryQueue"
+			}
+		},
+		"QueueName": {
+			"Description": "Name newly created SQS Celery Queue",
+			"Value": {
+				"Fn::GetAtt": [
+					"CeleryQueue",
+					"QueueName"
+				]
 			}
 		}
 	}
