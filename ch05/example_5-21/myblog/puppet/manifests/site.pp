@@ -6,7 +6,6 @@ node default {
   $db_endpoint = $userdata['db_endpoint']
   $db_user = $userdata['db_user']
   $db_password = $userdata['db_password']
-  $queue_endpoint = $userdata['queue_endpoint']
   $cache_endpoint = $userdata['cache_endpoint']
 
   case $role {
