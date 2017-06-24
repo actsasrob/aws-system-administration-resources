@@ -13,6 +13,12 @@
 		"CeleryAMI": {
 			"Type": "String"
 		},
+		"CeleryQueueAWSSecretKey": {
+			"Type": "String"
+		},
+		"CeleryQueueAWSSecretAccessKey": {
+			"Type": "String"
+		},
 		"InstanceType": {
 			"Description": "Type of EC2 instance to launch",
 			"Type": "String",
@@ -100,7 +106,7 @@
 		"CeleryQueue": {
 			"Type": "AWS::SQS::Queue",
 			"Properties": {
-				"QueueName": "celeryqueue"
+				"QueueName": "celery"
 			}
 		},
 		"MyBlogRole": {
