@@ -11,8 +11,7 @@ class myblog::celery {
     ensure              => present,
     ensure_process      => 'running',
     user                => 'mezzanine',
-    program_environment => {
-      'HOME'   => "${myblog::app_path}",
+    directory           => "${myblog::app_path}",
     }
   }
 
