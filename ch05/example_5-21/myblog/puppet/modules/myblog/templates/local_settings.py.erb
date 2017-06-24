@@ -1,3 +1,5 @@
+import urllib
+
 # Make these unique, and don't share it with anybody.
 SECRET_KEY = "np9co*)(@^_)((0s=ml%r5&@hqhu9b(&6^-%ad%&yyf%$=1ys2"
 NEVERCACHE_KEY = "nqd+3=pl7evznech#q8yb5nm$kd)zpv!o1(xs(+kyqy=(@%21w"
@@ -20,9 +22,19 @@ CACHES = {
    }
 }
 
-BROKER_URL = 'sqs://'
-BROKER_TRANSPORT_OPTIONS = {'region': 'us-east-1'}
-CELERY_IMPORTS = ('tasks')
+BROKER_URL = 'sqs://{0}:{1}@'.format(
+    urllib.quote('<%= @aws_secret_key %>', safe=''),
+    urllib.quote('<%= @aws_secret_access_key %>', safe='')
+)
+BROKER_TRANSPORT_OPTIONS = {
+    'region': 'us-east-1',
+    'polling_interval': 3,
+    'visibility_timeout': 3600,
+#    'queue_name_prefix': 'celery',
+}
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_SEND_TASK_ERROR_EMAILS = False
+
 
 INSTALLED_APPS = (
    "django.contrib.admin",
@@ -42,9 +54,8 @@ INSTALLED_APPS = (
    "mezzanine.pages",
    "mezzanine.galleries",
    "mezzanine.twitter",
-#"mezzanine.accounts",
-#"mezzanine.mobile",
    "djcelery",
+   "celerytasks.apps.CeleryTasksConfig",
 )
 
 LOGGING = {
@@ -55,7 +66,18 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugFalse'
         }
     },
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(message)s',
+             'datefmt': '%y %b %d, %H:%M:%S',
+            },
+        },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
@@ -67,7 +89,15 @@ LOGGING = {
         'filename': os.path.join(PROJECT_ROOT, 'APPNAME.log'),
         'maxBytes': 1024*1024*15, # 15MB
         'backupCount': 10,
-        }
+        },
+        'celery': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(PROJECT_ROOT, 'celery.log'),
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+            'backupCount': 10,
+        },
     },
     'loggers': {
         'django.request': {
@@ -78,6 +108,10 @@ LOGGING = {
         'APPNAME': {
             'handlers': ['applogfile',],
             'level': 'DEBUG',
-        }
+        },
+        'celery': {
+            'handlers': ['celery', 'console'],
+            'level': 'DEBUG',
+        },
     }
 }

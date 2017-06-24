@@ -1,17 +1,9 @@
 #!/bin/bash
 
-packer validate web.json
+packer validate packer_image.json
 if [ "$?" -ne 0 ]; then
-   echo "error: invalid packer template web.json"
+   echo "error: invalid packer template"
    exit 1
 fi
 
-packer build web.json
-
-packer validate celery.json
-if [ "$?" -ne 0 ]; then
-   echo "error: invalid packer template celery.json"
-   exit 1
-fi
-
-packer build celery.json
+packer build packer_image.json

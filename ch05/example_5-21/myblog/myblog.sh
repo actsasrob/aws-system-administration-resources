@@ -11,8 +11,8 @@ output=$(aws cloudformation create-stack --stack-name example-5-21-stack --templ
 file://cloudformation/myblog.json \
 --region us-east-1  --capabilities CAPABILITY_IAM \
 --parameters \
-ParameterKey=CeleryAMI,ParameterValue=ami-51a3d947 \
-ParameterKey=WebAMI,ParameterValue=ami-51a3d947 \
+ParameterKey=CeleryAMI,ParameterValue=ami-9eebb088 \
+ParameterKey=WebAMI,ParameterValue=ami-9eebb088 \
 ParameterKey=InstanceType,ParameterValue="t2.micro" \
 ParameterKey=DBUser,ParameterValue="myblogdbuser" \
 ParameterKey=DBPassword,ParameterValue="password\$1234" \

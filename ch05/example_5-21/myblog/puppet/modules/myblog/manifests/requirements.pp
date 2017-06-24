@@ -4,7 +4,7 @@ class myblog::requirements {
     ensure => installed
   }
 
-  $pip_packages = ["Mezzanine", "python-memcached", "django-celery"]
+  $pip_packages = ["Mezzanine", "python-memcached", "django-celery", "celery[sqs]"]
   package { $pip_packages:
     ensure => installed,
     provider => pip,

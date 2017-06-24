@@ -7,7 +7,8 @@ node default {
   $db_user = $userdata['db_user']
   $db_password = $userdata['db_password']
   $cache_endpoint = $userdata['cache_endpoint']
-
+  $aws_secret_key = $userdata['aws_secret_key']
+  $aws_secret_access_key = $userdata['aws_secret_access_key']
   case $role {
     "web": { $role_class = "myblog::web" }
     "celery": { $role_class = "myblog::celery" }
