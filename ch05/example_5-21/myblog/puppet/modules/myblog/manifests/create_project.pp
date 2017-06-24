@@ -13,6 +13,30 @@ class myblog::create_project {
     notify => Exec["init-mezzanine-db"],
   }
 
+  # Create celerytasks app directory structure
+  exec { "init-celerytasks-app":
+    command => "/usr/bin/python manage.py startapp ${myblog::tasks_app_name}",
+    user => "mezzanine",
+    cwd => $myblog::app_path,
+    refreshonly => true,
+  }
+
+  # Install Celery app config module
+  file { "${myblog::app_path}/${myblog::tasks_app_name}/apps.py":
+    ensure  => file,
+    owner => "mezzanine",
+    group => "mezzanine",
+    source  => "puppet:///modules/myblog/celeryapps.py",
+  }
+
+  # Install Celery tasks module
+  file { "${myblog::app_path}/${myblog::tasks_app_name}/tasks.py":
+    ensure  => file,
+    owner => "mezzanine",
+    group => "mezzanine",
+    source  => "puppet:///modules/myblog/celerytasks.py",
+  }
+
   file { "${myblog::app_path}/${myblog::app_name}/local_settings.py":
     ensure => present,
     content => template("myblog/local_settings.py.erb"),
@@ -61,27 +85,4 @@ class myblog::create_project {
     refreshonly => true,
   }
 
-  # Create celerytasks app directory structure
-  exec { "init-celerytasks-app":
-    command => "/usr/bin/python manage.py startapp ${myblog::tasks_app_name}",
-    user => "mezzanine",
-    cwd => $myblog::app_path,
-    refreshonly => true,
-  }
- 
-  # Install Celery app config module
-  file { "${myblog::app_path}/${myblog::tasks_app_name}/apps.py":
-    ensure  => file,
-    owner => "mezzanine",
-    group => "mezzanine",
-    source  => "puppet:///modules/myblog/celeryapps.py",
-  }
-
-  # Install Celery tasks module
-  file { "${myblog::app_path}/${myblog::tasks_app_name}/tasks.py":
-    ensure  => file,
-    owner => "mezzanine",
-    group => "mezzanine",
-    source  => "puppet:///modules/myblog/celerytasks.py",
-  }
 }
