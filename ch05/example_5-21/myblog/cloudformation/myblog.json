@@ -207,6 +207,16 @@
 										"ConfigurationEndpoint.Address"
 									]
 								},
+								"\",",
+								" \"aws_secret_key\": \"",
+								{
+									"Ref": "CeleryQueueAWSSecretKey"
+								},
+								"\",",
+								" \"aws_secret_access_key\": \"",
+								{
+									"Ref": "CeleryQueueAWSSecretAccessKey"
+								},
 								"\"}"
 							]
 						]
@@ -309,6 +319,16 @@
 										"CacheCluster",
 										"ConfigurationEndpoint.Address"
 									]
+								},
+								"\",",
+								" \"aws_secret_key\": \"",
+								{
+									"Ref": "CeleryQueueAWSSecretKey"
+								},
+								"\",",
+								" \"aws_secret_access_key\": \"",
+								{
+									"Ref": "CeleryQueueAWSSecretAccessKey"
 								},
 								"\" }"
 							]
