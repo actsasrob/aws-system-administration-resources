@@ -5,14 +5,14 @@ class myblog::celery {
 
   supervisord::program { 'myblog_celery':
     command             => "celery -A ${myblog::app_name} worker -l debug -Q celery",
-    priority            => '105',
+    priority            => '100',
     autostart           => true,
     autorestart         => true,
     ensure              => present,
     ensure_process      => 'running',
     user                => 'mezzanine',
     program_environment => {
-      'HOME'   => '${myblog::app_path}',
+      'HOME'   => "${myblog::app_path}",
     }
   }
 
