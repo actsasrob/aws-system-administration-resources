@@ -12,7 +12,8 @@ class myblog::create_project {
     creates => "${myblog::app_path}/__init__.py",
     notify => Exec["init-mezzanine-db"],
   }
-
+ 
+  # Install the Django local_settings.py config file
   file { "${myblog::app_path}/${myblog::app_name}/local_settings.py":
     ensure => present,
     content => template("myblog/local_settings.py.erb"),
@@ -22,6 +23,7 @@ class myblog::create_project {
     notify => Exec["init-mezzanine-db"]
   }
 
+  # Update the local_settings.py config file to allow non-local access to web application
   file_line { 'settingspy_allowed_hosts':
     path  => "${myblog::app_path}/${myblog::app_name}/settings.py",
     line => 'ALLOWED_HOSTS = "*"',
@@ -37,7 +39,7 @@ class myblog::create_project {
     source  => "puppet:///modules/myblog/myblogapps.py",
   }
 
-  # Install myblog celery module
+  # Install myblog celery module which initializes Celery
   file { "${myblog::app_path}/${myblog::app_name}/_celery.py":
     ensure  => file,
     owner => "mezzanine",
@@ -45,7 +47,7 @@ class myblog::create_project {
     source  => "puppet:///modules/myblog/_celery.py",
   }
 
-  # Install myblog python module init script
+  # Install myblog python module init script which forces the _celery.py module to be loaded at application start
   file { "${myblog::app_path}/${myblog::app_name}/__init__.py":
     ensure  => file,
     owner => "mezzanine",
@@ -61,7 +63,7 @@ class myblog::create_project {
     refreshonly => true,
   }
 
-  # Create celerytasks app directory structure
+  # Create a reusable Django app named celerytasks containing the shared Celery tasks and Django post_save signal handlers
   exec { "init-celerytasks-app":
     command => "/usr/bin/python manage.py startapp ${myblog::tasks_app_name}",
     creates => "${myblog::app_path}/${myblog::tasks_app_name}",
@@ -69,7 +71,7 @@ class myblog::create_project {
     cwd => $myblog::app_path,
   }
 
-  # Install Celery app config module
+  # Install celerytasks app config module. Allows celerytasks app to be loaded at application start via the INSTALLED_APPS list in local_settings.py
   file { "${myblog::app_path}/${myblog::tasks_app_name}/apps.py":
     ensure  => file,
     owner => "mezzanine",
@@ -77,7 +79,7 @@ class myblog::create_project {
     source  => "puppet:///modules/myblog/celeryapps.py",
   }
 
-  # Install Celery tasks module
+  # Install Celery tasks module containing shared Celery task(s)
   file { "${myblog::app_path}/${myblog::tasks_app_name}/tasks.py":
     ensure  => file,
     owner => "mezzanine",
@@ -85,6 +87,10 @@ class myblog::create_project {
     source  => "puppet:///modules/myblog/tasks.py",
   }
 
+  # Enable the celerytasks.apps.CeleryTasksConfig entry in local_settings.py.
+  # Keep in mind the 'python manage.py' commands read the project local_settings.py file.
+  # The celerytasks app config cannot be enabaled in INSTALLED_APPS in local_settings.py until all the necessary
+  # files have been added to the celerytasks directory otherwise it breaks the 'python manage.py' command.
   file_line { 'uncomment-line-in-local-settings':
     path    => "${myblog::app_path}/${myblog::app_name}/local_settings.py",
     line    => '   "celerytasks.apps.CeleryTasksConfig",',

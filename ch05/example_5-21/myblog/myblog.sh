@@ -13,10 +13,12 @@ file://cloudformation/myblog.json \
 --parameters \
 ParameterKey=CeleryAMI,ParameterValue=ami-9eebb088 \
 ParameterKey=WebAMI,ParameterValue=ami-9eebb088 \
+ParameterKey=CeleryQueueAWSSecretKey,ParameterValue="<change_me>" \
+ParameterKey=CeleryQueueAWSSecretAccessKey,ParameterValue="<change_me>" \
 ParameterKey=InstanceType,ParameterValue="t2.micro" \
 ParameterKey=DBUser,ParameterValue="myblogdbuser" \
 ParameterKey=DBPassword,ParameterValue="password\$1234" \
-ParameterKey=KeyName,ParameterValue=RobertHughes)
+ParameterKey=KeyName,ParameterValue=<change_me>)
 
 if [ "$?" -eq 0 ]; then
    stackid=$(echo "$output" | grep "StackId" | awk '{ print $2 }' | tr -d '"')

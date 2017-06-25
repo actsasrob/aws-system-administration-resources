@@ -4,15 +4,9 @@ import os
 
 from celery import Celery
 
-#from django.dispatch import receiver
-#from django.db.models.signals import post_save
-#from mezzanine.generic.models import ThreadedComment
-
 from django.conf import settings  # noqa
 
 from kombu import Exchange, Queue
-
-#from myblogtasks.tasks import process_comment_async
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myblog.settings')

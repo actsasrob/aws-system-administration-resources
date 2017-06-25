@@ -9,6 +9,8 @@ node default {
   $cache_endpoint = $userdata['cache_endpoint']
   $aws_secret_key = $userdata['aws_secret_key']
   $aws_secret_access_key = $userdata['aws_secret_access_key']
+  $queue_name = $userdata['queue_name']
+
   case $role {
     "web": { $role_class = "myblog::web" }
     "celery": { $role_class = "myblog::celery" }
