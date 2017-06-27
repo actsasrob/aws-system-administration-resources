@@ -38,7 +38,7 @@ start_rclocal() {
       sleep 5 
    done 
 
-   rm -rf /opt/puppetlabs/puppet/cache/state/graphs 
+   rm -rf /opt/puppetlabs/puppet/cache/ 
    /opt/puppetlabs/bin/puppet apply /etc/puppetlabs/code/environments/production/manifests/site.pp > /var/log/rc.local.log 2>&1
    return $?
 }

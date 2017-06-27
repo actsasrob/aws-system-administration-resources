@@ -13,7 +13,6 @@ class myblog::celery {
     ensure_process      => 'running',
     user                => 'mezzanine',
     directory           => "${myblog::app_path}",
-    }
   }
 
 }
