@@ -312,6 +312,11 @@ Steps to run this example:
 
 4. Run the example_21/myblog/myblog_sh script to kick off the CloudFormation build process to provision the AWS cluster.
 
+   The example_21/myblog.sh invokes 'aws cloudformation' CLI to create EC2 instance using CloudFormation template. 
+   _**NOTE: Costs will be incurred for creating AWS resources!!!**_
+
+   Before running the above script you must set up your AWS credentials in ~/.aws/credentials or via environment variables.
+
    First edit example_21/myblog.sh as follows:
 
       Replace the "<change_ami>" text with the AMI ID from step 2 above.
@@ -319,6 +324,7 @@ Steps to run this example:
       Replace the "<change_key>" text with an SSH key for your AWS account. This key will allow ssh access to the web/Celery EC2 instances created by CloudFormation.
 
    **NOTE:** The CloudFormation script is hardcoded to the us-east-1 AWS region. Modify the "--region" parameter in myblog.sh and the CloudFormation .json file to launch resources in a different regions if desired.
+
 
    Now execute example_21/myblog.sh to launch the CloudFormation script. The script will hang until all AWS resources have been created.
 
