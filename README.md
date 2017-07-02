@@ -275,24 +275,84 @@ Update CloudFormation template to create IAM role/policy allowing web/celery EC2
 
 ### example_5-21
 
-Example 5-21 is a work in progress.
+
+Example 5-21 uses AWS CloudFormation, puppet, and packer  to provision a Django/Mezzanine-based blogging platform. EC2 web instances serve up the Mezzanine web application providing admins the ability to blog. Users can comment on blogs. When comments are saved a Django "post_save" signal fires. A signal handler residing in the "celerytasks" app within the Mezzanine project acts as a receiver for the signal. The signal handler, "process_comment()", invokes the "process_comment_async()" Celery task to asynchronously process the comment to determine if the comment contains spam. Celery uses AWS SQS as the message queue transport. Celery worker tasks reside on the EC2 Celery instance. Celery works poll a configured SQS queue for work. Celery handles serializing the "process_comment_async() function to SQS. The Celery worker invokes the function and is passed a reference to the actual comment to process. The Celery worker, in this case, performs a simple check to determine if the comment contanins spam, and if so, uses the Mezzanine ThreadedComment model to retrieve the actual comment object from the Mezzanine DB and updates its status to be non-pubic which effectively renders the comment not visibile to application  users.
+
+The example works with the following caveats:
+
+**CAVEAT 1:** I believe the intention of the example in the book was to use packer to fully provision a web AMI with a functional Mezzaine web app and a celery AMI with a functional Celery tasks module and worker. However, in the book only the role(web or celery) is passed to the EC2 instance. When the 'puppet apply' command is executed it fails to fully provision the respective EC2 instance because, among other things, database credentials are needed to fully provision the application. Since DB credentials are not available at the time packer runs puppet cannot successfully build out the web/celery instances. I changed the behavior to install the puppet modules and dependent puppet modules at packer build time. In addition an /etc/rc.local service init script is installed which will run 'puppet apply' when and EC2 instance boots up. Since AWS CloudFormationw will pass the needed roles and metadata, e.g. DB credentials, the 'puppet apply' command can build out the server the first time it boots up (at the expense of a longer boot time the first time the EC2 instance is booted). The web/celery role are no longer passed to the tempory EC2 instance when packer runs. As such two separate AMIs (one for web and one for Celery) are no longer needed. The packer build script now only builds a single AMI.
+
+**CAVEAT 2:** I believe the intent of the book was to create an EC2 instance profile, as opposed to using username/password or access key/secret access key,  that allows the web and celery EC2 instances sufficient permissions to interfact with the SQS queue created via CloudFormation. However it appears Celery does not recognize the available EC2 instance profile. It seems to require credentials to be passed into via broker transport options. To make the example work I created a temporary user using IAM and grant it the "AmazonSQSFullAccess" policy. The access key/secret access key for this user were downloaded. The CloudFormation script was modified to allow the access key/secret access key to be passed to the web/celery instances via EC2 user-data. The Celery producer and consumer instances use these credentials to interfact with SQS.
+
+**CAVEAT 3:** I found I could use the Django/Mezzanine local_settings.py to configure the name of the SQS queue used by the Celery consumer. However the Celery producer does to pick up these settings and always uses the default Celery queue named 'celery'. To make the example work the Celery consumer is configured, via local_settings.py, to use the default queue name.
+
+
+Steps to run this example:
+
+1. Clone the git project:
+```
+   git clone https://github.com/actsasrob/aws-system-administration-resources.git
+   cd aws-system-administration-resources/ch05/example_5-21/myblog/packer
+```
+
+2. Build the AWS AMI containing the myblog puppet module and dependent puppet modules:
+
+   Edit the packer_image.json file. Change the "source_ami" setting to point to an Ubuntu 16.10 AMI as your base AMI. 
+   e.g. in the us-east-1 region I use: "ubuntu/images-testing/hvm-ssd/ubuntu-yakkety-daily-amd64-server-20170303.1 - ami-0f6fb419"
+   Save and exit.
+
+   You will need packer installed for the next step.
+   Execute the 'myblog.sh' script run packer to build the base web/celery AMI using the packer_image.json configuration file. Wait until this completes and then copy the AMI ID output at the end of the script. 
+
+   **NOTE:** If you modify the myblog puppet modules you will need to re-run the packer script to rebuild the base AMI regions. In this case you should fork the https://github.com/actsasrob/aws-system-administration-resources.git project. In your forked version of the git project modify .../example_21/myblog/packer/install_puppet.sh to clone your forked project. If you modify the puppet modules you must check changes into your git project as install_puppet.sh always clones the latest git project during the packer build.
+
+   Next cd up one directory to the example_21/myblog directory.
+
+3. Create a tempory SQS user via IAM. e.g. 'tmp_sqs_user'. Grant this user the 'AmazonSQSFullAccess' role. This user will need sufficient permissions to create/read/write/delete SQS queues for your AWS account. Down the access key and secret access keys for this user.
+
+4. Run the example_21/myblog/myblog_sh script to kick off the CloudFormation build process to provision the AWS cluster.
+
+   First edit example_21/myblog.sh as follows:
+
+      Replace the "<change_ami>" text with the AMI ID from step 2 above.
+      Replace the "<secret_key>" and "<secret_access_key>" text with the secret key and secret access key from step 3 above.
+      Replace the "<change_key>" text with an SSH key for your AWS account. This key will allow ssh access to the web/Celery EC2 instances created by CloudFormation.
+
+   **NOTE:** The CloudFormation script is hardcoded to the us-east-1 AWS region. Modify the "--region" parameter in myblog.sh and the CloudFormation .json file to launch resources in a different regions if desired.
+
+   Now execute example_21/myblog.sh to launch the CloudFormation script. The script will hang until all AWS resources have been created.
+
+4. Create blog entries. 
+
+You must be an admin user to create blog entries. Use the steps below to create an admin user.
 
 **NOTE:** How to create admin account for mezzanine:
 ```
+ssh into EC2 web instance
+sudo su -
 cd /srv/myblog
 python manage.py createsuperuser
 ```
 
+You can find the URL for the Mezzanine web app in the CloudFormation 'Outputs' tab under key 'WebInstanceDNSName'.
+Navigate to the value for this key in a brower. Log in as the admin user created above.
 
+You should be able to create blog post as the admin user.
+
+Use the admin interface to create a non-admin user that has "Staff Access" level accesses. Use the user with staff accesses to create comments for blog entries. **NOTE:** only comment entries are checked for spam. For this example comments containing the word 'spam' anywhere in the comment content are considered spam. Create a number of comments with and without the word 'spam' in the content. Now log out and and log back in with the admin user. Navigate to the "Comments" dashboard. Any comment containing the word 'spam' should have a non-public status which means it is not visible to non-admin users.
+
+
+Example 5-21 works with the following pip packages:
+```
+pip list
+amqp (1.4.9)
+boto (2.47.0)
+celery (3.1.25)
+Django (1.10.7)
+django-celery (3.2.1)
+django-contrib-comments (1.8.0)
+kombu (3.0.37)
+Mezzanine (4.2.3)
+```
 ### ch05 TODO:
-* Provide working CloudFormation + masterless puppet example after example 5-9
-  * Use example 15a for this. However, I found you cannot use CloudFormation UserData to pass both roles and a shell script. It is one or the other. Given that it will be difficult to install the puppet agent and all the needed standard and custom Puppet modules via a shell script. Try to use UserData to set server role and then use packer to build a custom AMI with puppet agent and puppet modules baked in. Possibly install an /etc/rc.local script (sudo systemctl enable rc-local.service) to run 'puppet apply' after server boots the first time.
-  * Troubleshoot why mezzanine cannot connect to RDS database instance.
-* Provide working CloudFormation templates for chapter 5.
-
-## Misc
-```
-curl http://169.254.169.254/latest/user-data
-curl http://169.254.169.254/latest/meta-data
-```
-
+  * Troubleshoot why Celery producer defaults to using queue named "celery" vs the queue configured in local_settings.py
