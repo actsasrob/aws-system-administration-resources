@@ -295,7 +295,7 @@ Steps to run this example:
    cd aws-system-administration-resources/ch05/example_5-21/myblog/packer
 ```
 
-2. Build the AWS AMI containing the myblog puppet module and dependent puppet modules:
+2. Use packer to build AWS AMI containing the myblog puppet module and dependent puppet modules:
 
    Edit the packer_image.json file. Change the "source_ami" setting to point to an Ubuntu 16.10 AMI as your base AMI. 
    e.g. in the us-east-1 region I use: "ubuntu/images-testing/hvm-ssd/ubuntu-yakkety-daily-amd64-server-20170303.1 - ami-0f6fb419"
@@ -304,15 +304,15 @@ Steps to run this example:
 
    You will need packer installed for the next step.
 
-   Execute the 'myblog.sh' script to invoke packer to build the base web/celery AMI using the packer_image.json configuration file. Wait until this completes and then copy the AMI ID output at the end of the script. 
+   Execute the ---/example_5-21/myblog/packer/packer_build.sh' script to invoke packer to build the base web/celery AMI using the packer_image.json configuration file. Wait until this completes and then copy the AMI ID output at the end of the script. 
 
-   **NOTE:** If you modify the myblog puppet modules you will need to re-run the packer script to rebuild the base AMI images. In this case you should fork the https://github.com/actsasrob/aws-system-administration-resources.git project. In your forked version of the git project modify .../example_21/myblog/packer/install_puppet.sh to clone your forked project. If you modify the puppet modules you must check changes into your git project as the install_puppet.sh script always clones the latest git project during the packer build.
+   **NOTE:** If you modify the myblog puppet modules you will need to re-run the packer script to rebuild the base AMI images. In this case you should fork the https://github.com/actsasrob/aws-system-administration-resources.git project. In your forked version of the git project modify .../example_5-21/myblog/packer/install_puppet.sh to clone your forked project. If you modify the puppet modules you must check changes into your git project as the install_puppet.sh script always clones the latest git project during the packer build.
 
    Next cd up one directory to the example_5-21/myblog directory.
 
-3. Create a tempory SQS user via IAM. e.g. 'tmp_sqs_user'. Grant this user the 'AmazonSQSFullAccess' role. This user will need sufficient permissions to create/read/write/delete SQS queues for your AWS account. Down the access key and secret access keys for this user.
+3. Create a tempory SQS user via IAM. e.g. 'tmp_sqs_user'. Grant this user the 'AmazonSQSFullAccess' role. This user will need sufficient permissions to create/read/write/delete SQS queues for your AWS account. Download the access key and secret access keys for this user. The access key and secret access key will be used in the next step.
 
-4. Run the example_21/myblog/myblog_sh script to kick off the CloudFormation build process to provision the AWS cluster.
+4. Run the example_5-21/myblog/myblog_sh script to kick off the CloudFormation build process to provision the AWS cluster.
 
    The example_21/myblog.sh invokes 'aws cloudformation' CLI to create EC2 instances using the CloudFormation template. 
    _**NOTE: Costs will be incurred for creating AWS resources!!!**_
