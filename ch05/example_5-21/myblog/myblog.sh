@@ -11,8 +11,8 @@ output=$(aws cloudformation create-stack --stack-name example-5-21-stack --templ
 file://cloudformation/myblog.json \
 --region us-east-1  --capabilities CAPABILITY_IAM \
 --parameters \
-ParameterKey=CeleryAMI,ParameterValue=ami-9eebb088 \
-ParameterKey=WebAMI,ParameterValue=ami-9eebb088 \
+ParameterKey=CeleryAMI,ParameterValue=ami-04dde312 \
+ParameterKey=WebAMI,ParameterValue=ami-04dde312 \
 ParameterKey=CeleryQueueAWSSecretKey,ParameterValue="<change_me>" \
 ParameterKey=CeleryQueueAWSSecretAccessKey,ParameterValue="<change_me>" \
 ParameterKey=InstanceType,ParameterValue="t2.micro" \

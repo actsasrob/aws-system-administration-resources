@@ -34,11 +34,15 @@ cat << 'EOF' | sudo tee /etc/rc.local
 
 start_rclocal() {
    while fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
-      echo "Waiting for dpkg lock to be released..." 
+      echo "Waiting for dpkg lock to be released..." > /var/log/rc.local.log 2>&1
       sleep 5 
    done 
 
    rm -rf /opt/puppetlabs/puppet/cache/ 
+   /opt/puppetlabs/bin/puppet apply /etc/puppetlabs/code/environments/production/manifests/site.pp > /var/log/rc.local.log 2>&1
+   sleep 5
+   /opt/puppetlabs/bin/puppet apply /etc/puppetlabs/code/environments/production/manifests/site.pp > /var/log/rc.local.log 2>&1
+   sleep 5
    /opt/puppetlabs/bin/puppet apply /etc/puppetlabs/code/environments/production/manifests/site.pp > /var/log/rc.local.log 2>&1
    return $?
 }
