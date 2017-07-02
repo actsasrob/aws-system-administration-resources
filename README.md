@@ -297,29 +297,29 @@ Steps to run this example:
 
 2. Use packer to build AWS AMI containing the myblog puppet module and dependent puppet modules:
 
-   Edit the packer_image.json file. Change the "source_ami" setting to point to an Ubuntu 16.10 AMI as your base AMI. 
+   Edit the .../example_5-21/myblog/packer/packer_image.json file. Change the "source_ami" setting to point to an Ubuntu 16.10 AMI as your base AMI. 
    e.g. in the us-east-1 region I use: "ubuntu/images-testing/hvm-ssd/ubuntu-yakkety-daily-amd64-server-20170303.1 - ami-0f6fb419"
 
    Save and exit.
 
    You will need packer installed for the next step.
 
-   Execute the ---/example_5-21/myblog/packer/packer_build.sh' script to invoke packer to build the base web/celery AMI using the packer_image.json configuration file. Wait until this completes and then copy the AMI ID output at the end of the script. 
+   Execute the .../example_5-21/myblog/packer/packer_build.sh' script to invoke packer to build the base web/celery AMI using the packer_image.json configuration file. Wait until this completes and then copy the AMI ID output at the end of the script. 
 
    **NOTE:** If you modify the myblog puppet modules you will need to re-run the packer script to rebuild the base AMI images. In this case you should fork the https://github.com/actsasrob/aws-system-administration-resources.git project. In your forked version of the git project modify .../example_5-21/myblog/packer/install_puppet.sh to clone your forked project. If you modify the puppet modules you must check changes into your git project as the install_puppet.sh script always clones the latest git project during the packer build.
 
    Next cd up one directory to the example_5-21/myblog directory.
 
-3. Create a tempory SQS user via IAM. e.g. 'tmp_sqs_user'. Grant this user the 'AmazonSQSFullAccess' role. This user will need sufficient permissions to create/read/write/delete SQS queues for your AWS account. Download the access key and secret access keys for this user. The access key and secret access key will be used in the next step.
+3. Create a temporary SQS user via IAM. e.g. 'tmp_sqs_user'. Grant this user the 'AmazonSQSFullAccess' role. This user will need sufficient permissions to create/read/write/delete SQS queues for your AWS account. Download the access key and secret access keys for this user. The access key and secret access key will be used in the next step.
 
 4. Run the example_5-21/myblog/myblog_sh script to kick off the CloudFormation build process to provision the AWS cluster.
 
-   The example_21/myblog.sh invokes 'aws cloudformation' CLI to create EC2 instances using the CloudFormation template. 
+   The example_5-21/myblog.sh script invokes 'aws cloudformation' CLI to create EC2 instances using the CloudFormation template. 
    _**NOTE: Costs will be incurred for creating AWS resources!!!**_
 
-   Before running the above script you must set up your AWS credentials in ~/.aws/credentials or via environment variables.
+   Before running the myblog.sh script you must set up your AWS credentials in ~/.aws/credentials or via environment variables.
 
-   First edit example_21/myblog.sh as follows:
+   First edit example_5-21/myblog.sh as follows:
 
 ```
       Replace the "<change_ami>" text with the AMI ID from step 2 above.
@@ -332,7 +332,7 @@ Steps to run this example:
 
    Now execute example_5-21/myblog.sh to launch the CloudFormation script. The script will hang until all AWS resources have been created.
 
-4. Create blog entries using Mezzanine app:
+5. Create blog entries using Mezzanine app:
 
 You must be an admin user to create blog entries. Use the steps below to create an admin user:
 
@@ -351,6 +351,49 @@ You should be able to create blog post as the admin user.
 
 Use the admin interface to create a non-admin user that has "Staff Access" level accesses. Use the user with staff accesses to create comments for blog entries. **NOTE:** only comment entries are checked for spam. For this example comments containing the word 'spam' anywhere in the comment content are considered spam. Create a number of comments with and without the word 'spam' in the content. Now log out and and log back in with the admin user. Navigate to the "Comments" dashboard. Any comment containing the word 'spam' should have a non-public status which means it is not visible to non-admin users.
 
+
+#### Example 5-21 project contents:
+
+```
+├── APPNAME.log
+├── celery.log
+├── myblog
+│   ├── apps.py
+│   ├── _celery.py
+│   ├── __init__.py
+│   ├── local_settings.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.p
+├── celerytasks
+│   ├── admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── migrations
+│   │   ├── __init__.py
+│   ├── models.py
+│   ├── tasks.py
+│   ├── tests.py
+│   └── views.py
+├── fabfile.py
+├── __init__.py
+├── manage.py
+```
+
+The top-level Django/Mezzanine dir is /srv/myblog. The top-level Django/Mezzaine project dir /srv/myblog/myblog is created when the /usr/local/bin/mezzanine-project script is executed via puppet. Most of the contents of /srv/myblog/myblog are created by the mezzanine-project script.
+
+I found the Celery consumer (e.g. Celery worker instances) part of the app could find the tasks.py file but the Celery producer part of the app did not discover the tasks module. Spent a bunch of time trying to organize/configure the project so that the producer would find tasks.py. Ended up going back to the Celery tutorial and attempting to follow the recommended instructions(http://www.pythondoc.com/celery-3.1.11/django/first-steps-with-django.html#using-celery-with-django) to create a Celery project. This resulted in the /srv/myblog/myblog/__init__.py and /srv/myblog/myblog/_celery.py files. (You may notice the funny filename _celery.py. The Celery tutorial recommends the file name as "celery.py" and __init__.py should import celery.py as .celery.py. I found in practice there was a collision between the local Celery module named celery.py and the actual Celery python module. As a result I renamed the local Celery module to _celery.py).
+
+The Celery tutorial recommends using the app.autodiscover_tasks(lambda: settings.INSTALLED_APPS) invocation to discover Django apps containing Celery tasks. This did not work for me.
+
+I did move the celery tasks module to a separate Django app named celerytasks in /srv/myblog/celerytasks. tasks.py now resides in /srv/myblog/celerytasks. I created a separate Django app as it seemed to be more realistic with how a Django app would interfact with Celery to perform asynchronous message processing. Most of the files that reside in /srv/myblog/celerytasks were created when the '/usr/bin/python manage.py startapp celerytasks' command is executed by puppet.
+
+I added the /srv/myblog/celerytasks/apps.py module in an attempt to have Django discover both the Celery tasks.py module and the 'post_save' Django signal handlers. According to various Django tutorials it seems to be a standard practice to create a class, e.g. class CeleryTasksConfig in apps.py, to configure a Django app. The second step is to add an entry like '   "celerytasks.apps.CeleryTasksConfig",' in /srv/myblog/myblog/local_settings.py to have the Django app loaded/configured at application boot time. Adding the class and adding the config entry in local_settings.py did not, by itself, help Django to find the tasks.py file or to register post_save signal handlers. The magic step was to add the 'from celerytasks.tasks import process_comment' like to /srv/myblog/celerytasks/apps.py. This import causes the celerytasks/tasks.py Celery tasks module to be discovered during application boot. I believe it also causes the 'post_save' signal handlers to be registered. I believe the "@register" decorator for the process_comment() function in celerytasks/tasks.py is responsible for registering the 'post_save' signal handlers.
+
+An unfortunate side-effect of importing celerytasks/tasks.py during application initialization is that the tasks.py module cannot reference any Django models outside of the application itself.
+Notice the '#from mezzanine.generic.models import ThreadedComment' import is commented out in celerytasks/tasks.py. If this line is uncommented Django throws an 'django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet' exception at application boot. Although, strangely, the import 'from django.db.models.signals import post_save' does not result in an exception. This situation is unforunate in that it would be nice to add a decorator such as '@receiver(post_save, sender=ThreadedComment)' to filter the process_comment() receiver to only be invoked when ThreadedComment instances are saved. I worked around this by filtering(see 'if isinstance(threadedcomment, ThreadedComment):' line in process_comment_async() in celerytasks/tasks.py) to filter out all object types except ThreadedComment instances.
+ 
+ 
 
 Example 5-21 works with the following pip package versions:
 ```
